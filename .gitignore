@@ -46,3 +46,7 @@ next-env.d.ts
 # benchmark / log outputs
 benchmark/results.json
 *.log
+
+# study guide & internal notes (do not commit to public repository)
+/study-guide/
+study-guide/

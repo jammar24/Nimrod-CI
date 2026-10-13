@@ -10,7 +10,19 @@ import { ShieldCheck, GitPullRequest, Menu, X, CheckCircle, Code2, Cpu, Globe } 
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [lang, setLang] = useState<'es' | 'en'>('es');
+  const [lang, setLang] = useState<'es' | 'en'>('en');
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('sentinel_lang') as 'es' | 'en' | null;
+    if (saved) setLang(saved);
+  }, []);
+
+  const handleToggleLang = () => {
+    const next = lang === 'en' ? 'es' : 'en';
+    setLang(next);
+    localStorage.setItem('sentinel_lang', next);
+  };
+
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const isEs = lang === 'es';
 
@@ -85,7 +97,7 @@ export default function LandingPage() {
 
             {/* Language switcher button */}
             <button
-              onClick={() => setLang(isEs ? 'en' : 'es')}
+              onClick={handleToggleLang}
               type="button"
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer"
               title={isEs ? 'Switch to English' : 'Cambiar a Español'}
@@ -110,7 +122,7 @@ export default function LandingPage() {
           {/* Mobile hamburger */}
           <div className="flex items-center gap-2 md:hidden">
             <button
-              onClick={() => setLang(isEs ? 'en' : 'es')}
+              onClick={handleToggleLang}
               type="button"
               className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-300"
             >

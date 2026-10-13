@@ -82,6 +82,8 @@ export function checkTypeScriptSyntax(code: string): SyntaxCheckResult {
   }
 }
 
+import { detectLanguage } from './detect';
+
 /**
  * Evaluates syntax based on programming language.
  */
@@ -89,7 +91,11 @@ export function checkSyntax(
   code: string,
   language: string = 'javascript'
 ): SyntaxCheckResult {
-  const normalizedLang = (language || '').toLowerCase().trim();
+  let normalizedLang = (language || '').toLowerCase().trim();
+
+  if (normalizedLang === 'auto' || !normalizedLang) {
+    normalizedLang = detectLanguage('', code);
+  }
 
   if (normalizedLang === 'typescript' || normalizedLang === 'ts') {
     return checkTypeScriptSyntax(code);
@@ -107,7 +113,7 @@ export function checkSyntax(
     };
   }
 
-  // Auto or other: attempt TS (which supersets JS)
+  // Auto or other fallback: attempt TS (which supersets JS)
   const tsCheck = checkTypeScriptSyntax(code);
   if (tsCheck.valid) return tsCheck;
 

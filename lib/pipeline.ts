@@ -1,6 +1,7 @@
 import { Finding, Patch, Verification, Report } from './schemas';
 import { assembleReport } from './report';
 import { SecurityFixture } from './examples';
+import { detectLanguage } from './detect';
 
 export type StepId = 'triage' | 'analyze' | 'enrich' | 'patch' | 'verify';
 export type StepStatus = 'idle' | 'running' | 'completed' | 'error';
@@ -75,6 +76,11 @@ export async function runLivePipeline(
   options: RunPipelineOptions
 ): Promise<PipelineExecutionResult> {
   const { diff, originalCode = '', language = 'auto', onProgress, signal } = options;
+  const resolvedLanguage =
+    language && language !== 'auto'
+      ? language
+      : detectLanguage(diff, originalCode);
+
   const startTime = Date.now();
 
   const steps: StepProgress[] = INITIAL_PIPELINE_STEPS.map((s) => ({ ...s }));
@@ -97,7 +103,7 @@ export async function runLivePipeline(
     const triageRes = await fetch('/api/triage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diff, language }),
+      body: JSON.stringify({ diff, language: resolvedLanguage }),
       signal,
     });
 
@@ -123,7 +129,7 @@ export async function runLivePipeline(
     const analyzeRes = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diff, language, riskyHunks }),
+      body: JSON.stringify({ diff, language: resolvedLanguage, riskyHunks }),
       signal,
     });
 
@@ -161,7 +167,7 @@ export async function runLivePipeline(
       const enrichRes = await fetch('/api/enrich', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ findings, language }),
+        body: JSON.stringify({ findings, language: resolvedLanguage }),
         signal,
       });
 
@@ -208,7 +214,7 @@ export async function runLivePipeline(
 
       // Synthesize PoC for JavaScript/TypeScript findings (fail-soft if model has low tokens)
       let currentPoc = null;
-      const isJsTs = !language.toLowerCase().includes('python') && language.toLowerCase() !== 'py';
+      const isJsTs = !resolvedLanguage.toLowerCase().includes('python') && resolvedLanguage.toLowerCase() !== 'py';
       if (isJsTs) {
         try {
           updateStep('verify', {
@@ -220,7 +226,7 @@ export async function runLivePipeline(
             body: JSON.stringify({
               finding,
               originalCode: effectiveCode,
-              language,
+              language: resolvedLanguage,
             }),
             signal,
           });
@@ -245,7 +251,7 @@ export async function runLivePipeline(
           body: JSON.stringify({
             finding,
             originalCode: effectiveCode,
-            language,
+            language: resolvedLanguage,
             feedback: feedback || undefined,
           }),
           signal,
@@ -271,7 +277,7 @@ export async function runLivePipeline(
             finding,
             patch: currentPatch,
             originalCode: effectiveCode,
-            language,
+            language: resolvedLanguage,
             iteration,
             poc: currentPoc || undefined,
           }),

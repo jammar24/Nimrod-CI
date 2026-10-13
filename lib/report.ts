@@ -283,3 +283,132 @@ export function formatHtmlReport(report: Report): string {
 export function formatJsonReport(report: Report): string {
   return JSON.stringify(report, null, 2);
 }
+
+/**
+ * Formats a Report object into OASIS SARIF v2.1.0 standard format
+ * Compatible with GitHub Code Scanning, CodeQL and CI/CD security tabs.
+ */
+export function formatSarifReport(report: Report): string {
+  const sarif = {
+    $schema: 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json',
+    version: '2.1.0',
+    runs: [
+      {
+        tool: {
+          driver: {
+            name: 'Sentinel-CI',
+            version: '1.0.0',
+            semanticVersion: '1.0.0',
+            informationUri: 'https://github.com/jammar24/sentinel-ci-hackathon',
+            rules: report.findings.map((f) => ({
+              id: f.cwe || f.id,
+              name: f.title.replace(/[^a-zA-Z0-9]/g, ''),
+              shortDescription: {
+                text: f.title,
+              },
+              fullDescription: {
+                text: f.explanation,
+              },
+              help: {
+                text: `${f.explanation}\n\nExploit Scenario:\n${f.exploitScenario}`,
+                markdown: `### ${f.title}\n\n${f.explanation}\n\n**Exploit Scenario:**\n> ${f.exploitScenario}\n\n**OWASP:** \`${f.owasp || 'N/A'}\``,
+              },
+              defaultConfiguration: {
+                level:
+                  f.severity === 'critical' || f.severity === 'high'
+                    ? 'error'
+                    : f.severity === 'medium'
+                    ? 'warning'
+                    : 'note',
+              },
+              properties: {
+                precision: f.confidence >= 0.8 ? 'very-high' : 'high',
+                securitySeverity:
+                  f.severity === 'critical'
+                    ? '9.5'
+                    : f.severity === 'high'
+                    ? '8.0'
+                    : f.severity === 'medium'
+                    ? '5.5'
+                    : '2.5',
+                tags: [
+                  'security',
+                  f.cwe || 'CWE',
+                  f.owasp || 'OWASP',
+                  'autonomous-patch-available',
+                ].filter(Boolean),
+              },
+            })),
+          },
+        },
+        results: report.findings.map((f) => {
+          const patch = report.patches.find((p) => p.findingId === f.id);
+          const verification = report.verifications.find((v) => v.findingId === f.id);
+
+          const result: any = {
+            ruleId: f.cwe || f.id,
+            message: {
+              text: `${f.title}: ${f.explanation}`,
+            },
+            level:
+              f.severity === 'critical' || f.severity === 'high'
+                ? 'error'
+                : f.severity === 'medium'
+                ? 'warning'
+                : 'note',
+            locations: [
+              {
+                physicalLocation: {
+                  artifactLocation: {
+                    uri: f.file || 'source.js',
+                    uriBaseId: '%SRCROOT%',
+                  },
+                  region: {
+                    startLine: f.lineStart || 1,
+                    endLine: f.lineEnd || f.lineStart || 1,
+                    snippet: {
+                      text: f.vulnerableSnippet || '',
+                    },
+                  },
+                },
+              },
+            ],
+          };
+
+          if (patch?.patchedCode) {
+            result.fixes = [
+              {
+                description: {
+                  text: `Apply verified Sentinel-CI patch: ${patch.rationale}`,
+                },
+                artifactChanges: [
+                  {
+                    artifactLocation: {
+                      uri: f.file || 'source.js',
+                    },
+                    replacements: [
+                      {
+                        deletedRegion: {
+                          startLine: f.lineStart || 1,
+                          endLine: f.lineEnd || f.lineStart || 1,
+                        },
+                        insertedContent: {
+                          text: patch.patchedCode,
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ];
+          }
+
+          return result;
+        }),
+      },
+    ],
+  };
+
+  return JSON.stringify(sarif, null, 2);
+}
+
