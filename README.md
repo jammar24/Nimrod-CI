@@ -5,9 +5,9 @@
 # NIMROD-CI 🛡️
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
-> Built by **Jamar Masias - 3m3r4l** ([@3m3r4l](https://github.com/3m3r4l)) for the Nebius x NVIDIA Global AI Hackathon.
+> Built by **Jamar Masias** ([@jammar24](https://github.com/jammar24)) for the Nebius x NVIDIA Global AI Hackathon.
 
-[![CI Quality Gate](https://github.com/3m3r4l/NIMROD-CI/actions/workflows/ci.yml/badge.svg)](https://github.com/3m3r4l/NIMROD-CI/actions)
+[![CI Quality Gate](https://github.com/jammar24/Nimrod-CI/actions/workflows/ci.yml/badge.svg)](https://github.com/jammar24/Nimrod-CI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black)](https://nextjs.org/)
 [![Inference](https://img.shields.io/badge/Inference-Nebius_Token_Factory-blue)](https://tokenfactory.nebius.com)
@@ -179,8 +179,8 @@ NIMROD-CI/
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/3m3r4l/NIMROD-CI.git
-cd NIMROD-CI
+git clone https://github.com/jammar24/Nimrod-CI.git
+cd Nimrod-CI
 npm install
 ```
 
@@ -200,8 +200,8 @@ MAX_DIFF_CHARS=20000
 MAX_VERIFY_ITERATIONS=2
 DAILY_REQUEST_CAP=300
 # Optional persistent Redis rate-limiter:
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
+UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_token_secret_of_upstash_here
 ```
 
 ### 3. Verify Model Connectivity
@@ -299,7 +299,7 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for full details.
 
 <p align="center">
   <img src="public/avatar.jpg" alt="Jamar Masias" width="120" style="border-radius: 50%;" /><br />
-  <strong>Jamar Masias - 3m3r4l</strong> (<a href="https://github.com/3m3r4l">@3m3r4l</a>)<br />
+  <strong>Jamar Masias </strong> (<a href="https://github.com/jammmar24">@jammar24</a>)<br />
   <em>Creator & Security Architect of Nimrod-CI</em>
 </p>
 
