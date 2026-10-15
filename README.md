@@ -3,7 +3,7 @@
 
 </p>
 
-# NIMROD-CI  <img width="100" height="100" alt="logod" src="https://github.com/user-attachments/assets/ee0a88f1-09ab-48a5-a4c0-5ea23b15cedc" />
+# Nimrod-CI  <img width="70" height="50" alt="logod" src="https://github.com/user-attachments/assets/ee0a88f1-09ab-48a5-a4c0-5ea23b15cedc" />
 
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
