@@ -1,11 +1,10 @@
 <p align="center">
+ <img width="1792" height="592" alt="Nimrod-CI Banner" src="https://github.com/user-attachments/assets/be8d0460-f5ea-4c92-b6c7-a22a7508c9a5" />
 
-  <img width="1792" height="592" alt="Nimrod-CI Banner" src="https://github.com/user-attachments/assets/be8d0460-f5ea-4c92-b6c7-a22a7508c9a5" />
-
-  <img src="public/logo-shield.png" alt="Nimrod-CI Shield" width="100" />
 </p>
 
-# NIMROD-CI 🛡️
+# NIMROD-CI  <img width="100" height="100" alt="logod" src="https://github.com/user-attachments/assets/ee0a88f1-09ab-48a5-a4c0-5ea23b15cedc" />
+
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
 > Built by **Jamar Masias** ([@jammar24](https://github.com/jammar24)) for the Nebius x NVIDIA Global AI Hackathon.
