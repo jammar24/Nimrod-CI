@@ -50,3 +50,5 @@ benchmark/results.json
 # study guide & internal notes (do not commit to public repository)
 /study-guide/
 study-guide/
+PENDIENTES.md
+SPEC.md

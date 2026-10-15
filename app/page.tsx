@@ -13,14 +13,14 @@ export default function LandingPage() {
   const [lang, setLang] = useState<'es' | 'en'>('en');
 
   React.useEffect(() => {
-    const saved = localStorage.getItem('sentinel_lang') as 'es' | 'en' | null;
+    const saved = localStorage.getItem('nimrod_lang') as 'es' | 'en' | null;
     if (saved) setLang(saved);
   }, []);
 
   const handleToggleLang = () => {
     const next = lang === 'en' ? 'es' : 'en';
     setLang(next);
-    localStorage.setItem('sentinel_lang', next);
+    localStorage.setItem('nimrod_lang', next);
   };
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -32,37 +32,37 @@ export default function LandingPage() {
     api: 'API',
     team: isEs ? 'Equipo' : 'Team',
     tryNow: isEs ? 'Probar ahora' : 'Try it now',
-    heroBadge: isEs ? 'Revisor de Seguridad Agéntico' : 'Agentic Security Reviewer',
+    heroBadge: isEs ? 'Revisión de seguridad agéntica' : 'Agentic security review',
     heroTitle1: isEs ? 'Un revisor de seguridad agéntico que ' : 'An agentic security reviewer that ',
     heroTitleGradient: isEs ? 'encuentra la vulnerabilidad' : 'finds the vulnerability',
-    heroTitle2: isEs ? ', escribe el parche y prueba que funciona.' : ', writes the patch and proves it works.',
+    heroTitle2: isEs ? ', sintetiza el parche y verifica con AST.' : ', synthesizes the patch and verifies with AST.',
     heroSubtitle: isEs
-      ? 'Automatiza tu flujo de seguridad con IA. Sentinel-CI analiza tus Pull Requests, detecta fallas críticas, las verifica en sandbox y genera soluciones garantizadas.'
-      : 'Automate your security workflow with AI. Sentinel-CI analyzes your pull requests, identifies critical flaws, verifies them in a sandbox, and proposes guaranteed fixes.',
+      ? 'Nimrod-CI analiza tus Pull Requests, detecta fallas de seguridad, obtiene referencias CWE/OWASP mediante Tavily y verifica parches con análisis de sintaxis AST y re-análisis del modelo.'
+      : 'Nimrod-CI analyzes your pull requests, detects security weaknesses, fetches CWE/OWASP references via Tavily, and verifies patches with AST syntax checks and model re-analysis.',
     readDocs: isEs ? 'Leer documentación' : 'Read Documentation',
     howItWorksTitle: isEs ? 'Cómo funciona' : 'How It Works',
     howItWorksSubtitle: isEs
-      ? 'Un pipeline completamente autónomo que transforma cómo auditas el código seguro.'
-      : 'A fully autonomous pipeline that transforms how you handle code security.',
+      ? 'Un pipeline completamente autónomo que audita el código, genera parches y re-analiza hallazgos para reducir falsos positivos.'
+      : 'A fully autonomous pipeline that audits code, synthesizes patches, and re-checks findings after patching to reduce false positives.',
     step1Title: isEs ? 'Pega un Diff' : 'Paste a Diff',
     step1Desc: isEs
       ? 'Proporciona un diff de código o conecta tu repositorio. Extraemos los cambios y los preparamos para un análisis profundo.'
       : 'Provide a code diff or connect your repository. We extract the changes and prepare them for deep analysis.',
     step2Title: isEs ? 'Pipeline Agéntico' : 'Agent Pipeline',
     step2Desc: isEs
-      ? 'Nuestro pipeline de 5 fases impulsado por Nemotron ejecuta: Triaje, Análisis Profundo, Enriquecimiento Web, Parcheo y Verificación en Sandbox.'
-      : 'Our 5-step Nemotron-powered pipeline runs: Triage, Deep Analysis, Web Enrichment, Patching, and Sandbox Verification.',
+      ? 'Nuestro pipeline de 5 fases impulsado por Nemotron ejecuta: Triaje, Análisis Profundo, Enriquecimiento Web, Parcheo y Verificación AST + Re-análisis.'
+      : 'Our 5-step Nemotron-powered pipeline runs: Triage, Deep Analysis, Web Enrichment, Patching, and AST Verification + Model Re-analysis.',
     step3Title: isEs ? 'Parche Verificado' : 'Verified Patch',
     step3Desc: isEs
-      ? 'Recibe un parche seguro garantizado y verificado mediante análisis AST sintáctico y ejecución aislada — listo para mergear.'
-      : 'Receive a guaranteed secure patch verified through AST parsing and sandboxed execution — ready to merge.',
+      ? 'Verification: apply the patch, run a syntax check, re-analyze the patched code with the model, retry up to 2 times.'
+      : 'Verification: apply the patch, run a syntax check, re-analyze the patched code with the model, retry up to 2 times.',
     patchVerified: isEs ? 'Parche Verificado' : 'Patch Verified',
-    readyToMerge: isEs ? 'Listo para producción' : 'Ready to merge',
+    readyToMerge: isEs ? 'Listo para revisión' : 'Ready for review',
     builtByTitle: isEs ? 'Equipo y Creador' : 'Built by',
-    teamRole: isEs ? 'Ingeniero de Seguridad & Desarrollador Full-Stack' : 'Security Engineer & Full-Stack Developer',
+    teamRole: isEs ? 'Ingeniero de Seguridad & Desarrollador' : 'Security Engineer & Developer',
     teamBio: isEs
-      ? 'Creador de Sentinel-CI para el Hackathon Nebius x NVIDIA. Especialista en ingeniería de agentes autónomos, validación AST y hardening de aplicaciones críticas.'
-      : 'Creator of Sentinel-CI for the Nebius x NVIDIA Hackathon. Focused on autonomous agentic workflows, AST safety validation, and critical application hardening.'
+      ? 'Creador de Nimrod-CI para el Hackathon Nebius x NVIDIA. Especialista en flujos de revisión autónomos y validación de seguridad AST.'
+      : 'Creator of Nimrod-CI for the Nebius x NVIDIA Hackathon. Focused on autonomous review workflows and AST safety validation.'
   };
 
   return (
@@ -72,11 +72,11 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400">
-              <ShieldCheck className="w-5 h-5" />
+          <Link href="/" className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center p-1">
+              <img src="/logo-shield.png" alt="Nimrod-CI Shield" className="w-full h-full object-contain" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-zinc-900 dark:text-white">Sentinel-CI</span>
+            <span className="font-bold text-lg tracking-tight text-zinc-900 dark:text-white">Nimrod-CI</span>
           </Link>
 
           {/* Desktop nav */}
@@ -86,7 +86,7 @@ export default function LandingPage() {
             <Link href="/docs#api" className="hover:text-zinc-900 dark:hover:text-white transition-colors">{t.api}</Link>
             <a href="#team" className="hover:text-zinc-900 dark:hover:text-white transition-colors">{t.team}</a>
             <a
-              href="https://github.com/jammar24/-sentinel-ci"
+              href="https://github.com/3m3r4l/nimrod-ci"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1.5"
@@ -167,18 +167,18 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent -z-10" />
 
           {/* Pure-CSS fade-up — no SSR mismatch */}
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center sentinel-hero-container">
-            <h1 className="sentinel-fade-up text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-6" style={{ animationDelay: '0ms' }}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center nimrod-hero-container">
+            <h1 className="nimrod-fade-up text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-6" style={{ animationDelay: '0ms' }}>
               {t.heroTitle1}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400">
                 {t.heroTitleGradient}
               </span>
               {t.heroTitle2}
             </h1>
-            <p className="sentinel-fade-up text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10 max-w-2xl mx-auto" style={{ animationDelay: '150ms' }}>
+            <p className="nimrod-fade-up text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10 max-w-2xl mx-auto" style={{ animationDelay: '150ms' }}>
               {t.heroSubtitle}
             </p>
-            <div className="sentinel-fade-up flex flex-col sm:flex-row justify-center items-center gap-4" style={{ animationDelay: '300ms' }}>
+            <div className="nimrod-fade-up flex flex-col sm:flex-row justify-center items-center gap-4" style={{ animationDelay: '300ms' }}>
               <Link
                 href="/analyze"
                 className="px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-base transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
@@ -250,7 +250,7 @@ export default function LandingPage() {
                     isEs ? 'Análisis Profundo' : 'Deep Analysis',
                     isEs ? 'Enriquecimiento' : 'Enrichment',
                     isEs ? 'Generación de Parche' : 'Patching',
-                    isEs ? 'Verificación AST + PoC' : 'Verification'
+                    isEs ? 'Verificación AST + Re-análisis' : 'AST Verification + Model Re-analysis'
                   ].map((step, i) => (
                     <div key={step} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50 px-3 py-1.5 rounded-lg">
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${i < 2 ? 'bg-emerald-500' : 'border-2 border-zinc-300 dark:border-zinc-600'}`} />
@@ -294,23 +294,20 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">{t.builtByTitle}</h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto mb-12">
               {isEs
-                ? 'Conoce a la mente detrás del desarrollo y la arquitectura de Sentinel-CI'
-                : 'Meet the team behind the development and architecture of Sentinel-CI'}
+                ? 'Conoce a la mente detrás del desarrollo y la arquitectura de Nimrod-CI'
+                : 'Meet the team behind the development and architecture of Nimrod-CI'}
             </p>
 
             <div className="inline-block max-w-md w-full p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md shadow-xl transition-all hover:border-emerald-500/40">
-              <div className="relative w-28 h-28 mx-auto rounded-full overflow-hidden mb-5 ring-4 ring-emerald-500/20 border-2 border-emerald-500/40 shadow-inner">
-                <Image
-                  src="/team-jamar.jpg"
-                  alt="Jamar Masias"
-                  fill
-                  sizes="112px"
-                  className="object-cover object-center"
-                  priority
+              <div className="w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20 bg-zinc-950">
+                <img
+                  src="/avatar.jpg"
+                  alt="Jamar Masias - 3m3r4l"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">Jamar Masias</h3>
-              <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold my-2">
+              <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold my-2 font-mono">
                 @3m3r4l
               </div>
               <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
@@ -321,13 +318,13 @@ export default function LandingPage() {
               </p>
               <div className="flex items-center justify-center gap-3">
                 <a
-                  href="https://github.com/jammar24"
+                  href="https://github.com/3m3r4l"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shadow-sm"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shadow-sm"
                 >
                   <GitPullRequest className="w-3.5 h-3.5" />
-                  GitHub Profile
+                  GitHub Profile (@3m3r4l)
                 </a>
               </div>
             </div>

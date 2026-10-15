@@ -1,7 +1,7 @@
 {
-  "name": "sentinel-ci",
+  "name": "nimrod-ci",
   "version": "0.1.0",
-  "author": "Jamar Masias",
+  "author": "Jamar Masias - 3m3r4l",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -1,8 +1,10 @@
-name: Sentinel-CI Autonomous Security Review Gate
+name: Nimrod-CI Autonomous Security Review Gate
 
 on:
-  pull_request:
-    branches: [main, master]
+  # Manual-only trigger to conserve credits before the live demo.
+  # To enable automated runs on every Pull Request, uncomment the block below:
+  # pull_request:
+  #   branches: [main, master]
   workflow_dispatch:
 
 permissions:

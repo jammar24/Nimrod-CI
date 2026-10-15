@@ -60,7 +60,7 @@ describe('lib/ratelimit: Abuse prevention and daily demo cap', () => {
       const capRes = await checkRateLimit(capReq, 20);
       expect(capRes.allowed).toBe(false);
       expect(capRes.isDailyCapExceeded).toBe(true);
-      expect(capRes.reason).toContain('Instant replay');
+      expect(capRes.reason).toContain('sample results');
     });
   });
 
@@ -159,7 +159,7 @@ describe('lib/ratelimit: Abuse prevention and daily demo cap', () => {
       const res4 = await checkRateLimit(req4, 10);
       expect(res4.allowed).toBe(false);
       expect(res4.isDailyCapExceeded).toBe(true);
-      expect(res4.reason).toContain('Instant replay');
+      expect(res4.reason).toContain('sample results');
     });
   });
 });

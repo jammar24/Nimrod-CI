@@ -15,7 +15,6 @@ import {
 import { Finding, Patch, Verification, Severity } from '@/lib/schemas';
 import { PatchDiff } from './PatchDiff';
 import { VerifiedBadge } from './VerifiedBadge';
-import { PocResultCard } from './PocResultCard';
 
 interface FindingCardProps {
   finding: Finding;
@@ -240,10 +239,6 @@ export function FindingCard({
                     <span>{isEs ? 'Crear PR con este Parche' : 'Open PR with this Fix'}</span>
                   </button>
                 </div>
-              )}
-
-              {verification?.pocResult && (
-                <PocResultCard pocResult={verification.pocResult} />
               )}
             </div>
           )}

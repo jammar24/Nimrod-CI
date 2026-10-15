@@ -60,7 +60,7 @@ describe('lib/report: Report assembly and formatting', () => {
     });
 
     const md = formatMarkdownReport(report);
-    expect(md).toContain('Sentinel-CI Security Review Report');
+    expect(md).toContain('Nimrod-CI Security Review Report');
     expect(md).toContain('🟢 PASS');
     expect(md).toContain('**Risk Score:** 0/100');
     expect(md).toContain('SQL Injection in Route');

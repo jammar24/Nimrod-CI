@@ -70,7 +70,7 @@ export function InputPanel({
 
   // GitHub PR mode state
   const [prUrlInput, setPrUrlInput] = useState<string>(
-    'https://github.com/jammar24/sentinel-ci-hackathon/pull/1'
+    'https://github.com/3m3r4l/nimrod-ci/pull/1'
   );
   const [prTokenInput, setPrTokenInput] = useState<string>('');
   const [isFetchingPr, setIsFetchingPr] = useState(false);
@@ -87,11 +87,7 @@ export function InputPanel({
   );
   const effectiveLanguage = language === 'auto' ? detectedLanguage : language;
 
-  // Load saved token from localStorage on mount
-  useEffect(() => {
-    const savedToken = localStorage.getItem('sentinel_github_pat');
-    if (savedToken) setPrTokenInput(savedToken);
-  }, []);
+  // In-memory PAT for visitor current tab only (never persisted to localStorage/sessionStorage)
 
   const maxChars = 20000;
   const currentChars =
@@ -407,13 +403,13 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => {
-                const url = 'https://github.com/jammar24/sentinel-ci-hackathon/pull/1';
+                const url = 'https://github.com/3m3r4l/nimrod-ci/pull/1';
                 setPrUrlInput(url);
                 handleFetchPr(url);
               }}
               className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-emerald-300 font-mono transition-colors cursor-pointer"
             >
-              sentinel-ci-hackathon#1
+              nimrod-ci#1
             </button>
             <button
               type="button"
@@ -524,7 +520,7 @@ export function InputPanel({
 
         <div className="flex items-center space-x-2 font-mono text-[11px]">
           <span className={isOverLimit ? 'text-rose-500 font-bold' : 'text-zinc-400 dark:text-zinc-500'}>
-            {currentChars.toLocaleString()} / {maxChars.toLocaleString()} chars
+            {currentChars.toLocaleString('en-US')} / {maxChars.toLocaleString('en-US')} chars
           </span>
         </div>
       </div>
@@ -664,17 +660,17 @@ export function InputPanel({
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-          {/* Instant Replay Button */}
+          {/* Load Sample Result Button */}
           {selectedFixture && (
             <button
               type="button"
               disabled={isRunning}
               onClick={() => onInstantReplay(selectedFixture)}
               className="min-h-[44px] flex items-center justify-center space-x-2 px-4 py-2 rounded-xl border border-cyan-300/80 dark:border-cyan-500/40 bg-cyan-50 dark:bg-cyan-500/10 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
-              title={isEs ? 'Repetición instantánea sin consumir créditos de API' : 'Instant replay precalculated run without using API credits'}
+              title={isEs ? 'Cargar resultado de muestra (ejemplo pre-cargado, no una ejecución en vivo)' : 'Load sample result (pre-loaded example, not a live run)'}
             >
               <Zap className="w-4 h-4 fill-cyan-500 text-cyan-500" />
-              <span>{isEs ? 'Repetición Instantánea (0 Créditos)' : 'Instant Replay (0 Credits)'}</span>
+              <span>{isEs ? 'Cargar resultado de muestra' : 'Load sample result'}</span>
             </button>
           )}
 

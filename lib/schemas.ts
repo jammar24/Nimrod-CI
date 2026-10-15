@@ -57,33 +57,6 @@ export const PatchSchema = z.object({
 });
 export type Patch = z.infer<typeof PatchSchema>;
 
-export const PocHarnessSchema = z.object({
-  findingId: z.string(),
-  description: z.string(),
-  attackInput: z.string(),
-  testHarnessCode: z.string(),
-  expectedVulnerableOutcome: z.string(),
-});
-export type PocHarness = z.infer<typeof PocHarnessSchema>;
-
-export const PocExecutionOutcomeSchema = z.object({
-  exploited: z.boolean(),
-  output: z.string(),
-  error: z.string().optional(),
-  durationMs: z.number(),
-});
-export type PocExecutionOutcome = z.infer<typeof PocExecutionOutcomeSchema>;
-
-export const PocVerificationResultSchema = z.object({
-  findingId: z.string(),
-  status: z.enum(['verified', 'unreproducible', 'still_exploitable', 'unsupported']),
-  beforePatch: PocExecutionOutcomeSchema,
-  afterPatch: PocExecutionOutcomeSchema,
-  poc: PocHarnessSchema,
-  notes: z.string(),
-});
-export type PocVerificationResult = z.infer<typeof PocVerificationResultSchema>;
-
 export const VerificationSchema = z.object({
   findingId: z.string(),
   syntaxOk: z.boolean(),
@@ -91,8 +64,7 @@ export const VerificationSchema = z.object({
   iterations: z.number().int().min(1),
   notes: z.string(),
   syntaxEngine: z.string().optional(),
-  verificationMethod: z.enum(['compiler_plus_model', 'model_only', 'poc_sandbox', 'compiler_only']).optional(),
-  pocResult: PocVerificationResultSchema.optional(),
+  verificationMethod: z.enum(['compiler_plus_model', 'model_only', 'compiler_only']).optional(),
 });
 export type Verification = z.infer<typeof VerificationSchema>;
 

@@ -1,5 +1,5 @@
 /**
- * GitHub API Integration for Sentinel-CI
+ * GitHub API Integration for NIMROD-CI
  * Handles fetching Pull Request diffs/files and autonomously creating Pull Requests with verified patches.
  */
 
@@ -139,10 +139,10 @@ export async function fetchGitHubPr(
 ): Promise<GitHubPrDetails> {
   const { owner, repo, pullNumber } = prRef;
   const headers: Record<string, string> = {
-    'User-Agent': 'Sentinel-CI-Autonomous-Security-Reviewer',
+    'User-Agent': 'NIMROD-CI-Autonomous-Security-Reviewer',
   };
 
-  const authToken = token || process.env.GITHUB_TOKEN;
+  const authToken = token;
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
@@ -268,20 +268,20 @@ export async function createGitHubPullRequest(
     baseBranch,
     filePath,
     patchedContent,
-    commitMessage = 'security: apply verified Sentinel-CI patch',
-    prTitle = '[Sentinel-CI] Autonomous Security Patch',
-    prBody = '### Sentinel-CI Automated Security Patch\n\nThis pull request contains a verified security patch synthesized by Sentinel-CI.',
+    commitMessage = 'security: apply verified Nimrod-CI patch',
+    prTitle = '[Nimrod-CI] Autonomous Security Patch',
+    prBody = '### Nimrod-CI Automated Security Patch\n\nThis pull request contains a verified security patch synthesized by Nimrod-CI.',
   } = payload;
 
-  const token = payload.token || process.env.GITHUB_TOKEN;
+  const token = payload.token;
   if (!token) {
     throw new Error(
-      'GitHub Token is required to create a Pull Request. Please provide a Personal Access Token (PAT) with `contents: write` and `pull_requests: write` permissions.'
+      'GitHub Personal Access Token (PAT) is required from visitor to create a Pull Request. Provide a PAT with repo write permissions.'
     );
   }
 
   const headers: Record<string, string> = {
-    'User-Agent': 'Sentinel-CI-Autonomous-Security-Reviewer',
+    'User-Agent': 'NIMROD-CI-Autonomous-Security-Reviewer',
     Authorization: `Bearer ${token}`,
     Accept: 'application/vnd.github.v3+json',
     'Content-Type': 'application/json',
@@ -313,7 +313,7 @@ export async function createGitHubPullRequest(
 
   // 2. Generate new branch name
   const timestamp = Date.now().toString(36);
-  const cleanBranchSlug = (payload.newBranch || `sentinel-ci/fix-${timestamp}`)
+  const cleanBranchSlug = (payload.newBranch || `NIMROD-CI/fix-${timestamp}`)
     .toLowerCase()
     .replace(/[^a-z0-9/_-]/g, '-');
   let targetBranch = cleanBranchSlug;

@@ -1,5 +1,5 @@
 /**
- * Language detection helper for Sentinel-CI.
+ * Language detection helper for NIMROD-CI.
  * Accurately determines programming language (python, typescript, javascript)
  * from unified diffs, filenames, and source code heuristics.
  */

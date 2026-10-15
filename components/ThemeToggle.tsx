@@ -7,7 +7,7 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('sentinel_theme') as 'dark' | 'light' | null;
+    const savedTheme = localStorage.getItem('nimrod_theme') as 'dark' | 'light' | null;
     const initialTheme = savedTheme || 'dark';
     setTheme(initialTheme);
     if (initialTheme === 'dark') {
@@ -20,7 +20,7 @@ export function ThemeToggle() {
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    localStorage.setItem('sentinel_theme', newTheme);
+    localStorage.setItem('nimrod_theme', newTheme);
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {

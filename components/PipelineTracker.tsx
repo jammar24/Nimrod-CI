@@ -21,7 +21,7 @@ const STEP_TRANSLATIONS: Record<string, { title: string; description: string }> 
   },
   enrich: {
     title: '3. Enriquecimiento de Seguridad',
-    description: 'Consulta en tiempo real con Tavily Search para mitigación y referencias CVE',
+    description: 'Obtiene referencias CWE/OWASP y fuentes actuales mediante Tavily',
   },
   patch: {
     title: '4. Parcheo Autónomo',
@@ -29,7 +29,7 @@ const STEP_TRANSLATIONS: Record<string, { title: string; description: string }> 
   },
   verify: {
     title: '5. Verificación AST y Modelo',
-    description: 'Aplica el parche, valida sintaxis AST y verifica la mitigación con pruebas',
+    description: 'Aplica el parche, valida sintaxis AST y re-analiza con el modelo (hasta 2 reintentos)',
   },
 };
 
@@ -49,7 +49,9 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
           </h2>
           {isReplay && (
             <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-              {isEs ? 'Ejecución Grabada' : 'Recorded Run'}
+              {isEs
+                ? 'Resultado de muestra (ejemplo pre-cargado, no una ejecución en vivo)'
+                : 'Sample result (pre-loaded example, not a live run)'}
             </span>
           )}
         </div>

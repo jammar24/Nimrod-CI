@@ -1,4 +1,4 @@
-# Sentinel-CI: Pendientes, correcciones y mejoras
+# NIMROD-CI: Pendientes, correcciones y mejoras
 
 > Fecha límite propia de entrega: **20 de octubre de 2026** (cierre oficial en Devpost: 30 de octubre).
 > Objetivo: pasar de "demo que se ve simple" a "herramienta que un equipo usaría", con evidencia de que funciona.
@@ -116,7 +116,7 @@ Primero local (en el navegador), sin base de datos.
 
 - [x] Campo para pegar una **URL de PR** y obtener el diff con la API de GitHub (con límite de tamaño y manejo de repos privados/errores).
 - [x] Modal y endpoint para **crear Pull Request de forma autónoma** con el parche verificado en GitHub (`/api/github` + `components/CreatePrModal.tsx`).
-- [x] **GitHub Action** que ejecute Sentinel-CI y comente el reporte en el PR (`.github/workflows/sentinel-review.yml` + `scripts/ci-review.mjs`).
+- [x] **GitHub Action** que ejecute NIMROD-CI y comente el reporte en el PR (`.github/workflows/sentinel-review.yml` + `scripts/ci-review.mjs`).
 - [x] Salida en **SARIF** (OASIS v2.1.0) para la pestaña Security de GitHub y botón de exportación en la UI.
 - [x] Ejemplo de uso en el README (workflow `.yml` listo para copiar y tabla de arquitectura).
 
@@ -124,7 +124,7 @@ Primero local (en el navegador), sin base de datos.
 
 ## 7. 🔴 Seguridad de la aplicación (checklist completo)
 
-Sentinel-CI es una herramienta de seguridad: si ella misma es insegura, pierde toda credibilidad ante los jueces. Esta sección amplía el punto 1.4.
+NIMROD-CI es una herramienta de seguridad: si ella misma es insegura, pierde toda credibilidad ante los jueces. Esta sección amplía el punto 1.4.
 
 ### 7.1 Secretos y configuración
 - [x] Ninguna API key (`NEBIUS_API_KEY`, `TAVILY_API_KEY`, Redis) en el código, en el bundle del cliente ni en respuestas de la API. Revisar con `grep` el build (`.next/static`).
@@ -181,7 +181,7 @@ Sentinel-CI es una herramienta de seguridad: si ella misma es insegura, pierde t
 - [x] Enviar a Tavily solo la consulta (CWE + título + lenguaje), **nunca el código del usuario**.
 
 ### 7.9 Prueba final de seguridad
-- [ ] Ejecutar Sentinel-CI contra **su propio repositorio**: es una buena historia para el video.
+- [ ] Ejecutar NIMROD-CI contra **su propio repositorio**: es una buena historia para el video.
 - [ ] Probar manualmente: archivo enorme, zip malicioso, JSON malformado, peticiones repetidas, caracteres raros, intento de inyección en cada campo.
 
 ---

@@ -115,7 +115,7 @@ export async function checkRateLimit(
           allowed: false,
           remaining: 0,
           isDailyCapExceeded: true,
-          reason: `Daily demo budget cap reached (${dailyCap} requests/day). To test Sentinel-CI without burning credits, please use the 'Instant replay' mode on the sample fixtures.`,
+          reason: `Daily demo budget cap reached (${dailyCap} requests/day). To test without burning credits, please use the sample results (pre-loaded examples).`,
         };
       }
 
@@ -153,7 +153,7 @@ export async function checkRateLimit(
       allowed: false,
       remaining: 0,
       isDailyCapExceeded: true,
-      reason: `Daily demo budget cap reached (${dailyCap} requests/day). To test Sentinel-CI without burning credits, please use the 'Instant replay' mode on the sample fixtures.`,
+      reason: `Daily demo budget cap reached (${dailyCap} requests/day). To test without burning credits, please use the sample results (pre-loaded examples).`,
     };
   }
 

@@ -13,7 +13,7 @@ const PatchRequestSchema = z.object({
   feedback: z.string().max(4000, 'Feedback exceeds 4000 characters limit').optional(),
 });
 
-const PATCH_SYSTEM_PROMPT = `You are Sentinel-CI Autonomous Patch Engineer.
+const PATCH_SYSTEM_PROMPT = `You are NIMROD-CI Autonomous Patch Engineer.
 Your task is to write a clean, minimal, syntactically correct security fix for the reported vulnerability.
 
 CRITICAL PRINCIPLES:

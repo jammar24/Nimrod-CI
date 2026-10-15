@@ -1,13 +1,13 @@
 # Security Policy & Privacy Architecture
 
-Sentinel-CI is an autonomous static security review agent designed for Pull Requests. Because Sentinel-CI inspects code for vulnerabilities, its own security posture and data privacy practices must be exemplary.
+NIMROD-CI is an autonomous static security review agent designed for Pull Requests. Because NIMROD-CI inspects code for vulnerabilities, its own security posture and data privacy practices must be exemplary.
 
 ---
 
 ## 1. Vulnerability Reporting
 
-If you discover a security vulnerability or bypass within Sentinel-CI, please report it responsibly:
-- **Email:** Jamar Masias at `security@sentinel-ci.dev` (or open a private security advisory on GitHub)
+If you discover a security vulnerability or bypass within NIMROD-CI, please report it responsibly:
+- **Email:** `security@3m3r4l.dev` (or Jamar Masias - 3m3r4l on GitHub: [github.com/3m3r4l](https://github.com/3m3r4l))
 - **Response SLA:** Acknowledgment within 24 hours; initial remediation plan within 72 hours.
 - Please do **not** open public GitHub issues for unpatched critical vulnerabilities or zero-days.
 
@@ -26,8 +26,8 @@ If you discover a security vulnerability or bypass within Sentinel-CI, please re
 - **Tavily Search API:**
   - **User code is NEVER sent to Tavily.**
   - Only normalized vulnerability descriptors (e.g. `CWE-89 SQL Injection secure coding remediation fix typescript`) are submitted to search for official OWASP/Mitre documentation.
-- **Instant Replay Mode:**
-  - Uses 100% pre-recorded and statically verified fixtures (`lib/examples.ts`). No network requests are made to Nebius or Tavily in this mode.
+- **Sample Results Mode:**
+  - Uses pre-loaded examples (`lib/examples.ts`). No network requests are made to Nebius or Tavily in this mode.
 
 ---
 

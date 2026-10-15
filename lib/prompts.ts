@@ -1,10 +1,10 @@
 /**
- * System and user prompts for Sentinel-CI reasoning pipeline.
+ * System and user prompts for NIMROD-CI reasoning pipeline.
  * Engineered for NVIDIA Nemotron reasoning models on Nebius Token Factory.
  * Strict prompt-injection resistance: all code input is explicitly isolated as untrusted data.
  */
 
-export const TRIAGE_SYSTEM_PROMPT = `You are Sentinel-CI Triage Engine, a specialized security analyzer.
+export const TRIAGE_SYSTEM_PROMPT = `You are NIMROD-CI Triage Engine, a specialized security analyzer.
 Your task is to quickly scan a code diff and identify which hunks or file segments contain potential security-relevant changes that warrant deep static analysis.
 
 CRITICAL INSTRUCTIONS:
@@ -25,7 +25,7 @@ CRITICAL INSTRUCTIONS:
 }
 5. Do NOT include markdown blocks, introductory greetings, or commentary. Output raw JSON only.`;
 
-export const ANALYZE_SYSTEM_PROMPT = `You are Sentinel-CI, a senior application security engineer doing SAST on a code change.
+export const ANALYZE_SYSTEM_PROMPT = `You are NIMROD-CI, a senior application security engineer doing SAST on a code change.
 Analyze ONLY added/modified lines; use surrounding lines for context.
 Report only real, exploitable weaknesses. Prefer precision over recall.
 

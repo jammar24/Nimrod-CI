@@ -21,35 +21,35 @@ export const INITIAL_PIPELINE_STEPS: StepProgress[] = [
     id: 'triage',
     title: '1. Fast Triage',
     description: 'Scanning diff to isolate high-risk hunks and logic modifications',
-    model: 'NVIDIA Nemotron Nano 30B',
+    model: 'NEBIUS_MODEL_FAST',
     status: 'idle',
   },
   {
     id: 'analyze',
     title: '2. Deep SAST Analysis',
     description: 'Reasoning over modified lines to classify CWE, OWASP and exploit paths',
-    model: 'NVIDIA Nemotron Super 120B',
+    model: 'NEBIUS_MODEL_PRIMARY',
     status: 'idle',
   },
   {
     id: 'enrich',
     title: '3. Security Knowledge Enrichment',
-    description: 'Querying real-time mitigation references and CVE cheat sheets',
-    model: 'Tavily Search API (Runtime)',
+    description: 'Fetches CWE/OWASP references and current sources via Tavily',
+    model: 'Tavily Search API',
     status: 'idle',
   },
   {
     id: 'patch',
     title: '4. Autonomous Patching',
     description: 'Synthesizing minimal, non-breaking security patches in unified diff',
-    model: 'NVIDIA Nemotron Super 120B',
+    model: 'NEBIUS_MODEL_PRIMARY',
     status: 'idle',
   },
   {
     id: 'verify',
     title: '5. AST & Model Verification',
-    description: 'Applying patch, verifying JS/TS AST syntax and re-analyzing vulnerability',
-    model: 'Compiler AST + Nemotron Nano',
+    description: 'Verification: apply the patch, run a syntax check, re-analyze patched code with model, retry up to 2 times',
+    model: 'Compiler AST + NEBIUS_MODEL_FAST',
     status: 'idle',
   },
 ];
@@ -69,7 +69,7 @@ export interface PipelineExecutionResult {
 }
 
 /**
- * Runs the live Sentinel-CI pipeline.
+ * Runs the live NIMROD-CI pipeline.
  * The client orchestrates the 5 steps sequentially against stateless server endpoints.
  */
 export async function runLivePipeline(
@@ -212,33 +212,6 @@ export async function runLivePipeline(
       let currentVerification: Verification | null = null;
       let feedback = '';
 
-      // Synthesize PoC for JavaScript/TypeScript findings (fail-soft if model has low tokens)
-      let currentPoc = null;
-      const isJsTs = !resolvedLanguage.toLowerCase().includes('python') && resolvedLanguage.toLowerCase() !== 'py';
-      if (isJsTs) {
-        try {
-          updateStep('verify', {
-            details: `Synthesizing executable PoC for ${finding.title}...`,
-          });
-          const pocRes = await fetch('/api/poc', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              finding,
-              originalCode: effectiveCode,
-              language: resolvedLanguage,
-            }),
-            signal,
-          });
-          if (pocRes.ok) {
-            const pocData = await pocRes.json();
-            currentPoc = pocData.poc;
-          }
-        } catch {
-          // Continue gracefully if PoC synthesis fails
-        }
-      }
-
       for (let iteration = 1; iteration <= 2; iteration++) {
         // Generate Patch
         updateStep('patch', {
@@ -265,9 +238,9 @@ export async function runLivePipeline(
         const patchData = await patchRes.json();
         currentPatch = patchData.patch;
 
-        // Verify Patch with AST Compiler, Model Re-Analysis, and Executable Sandbox PoC
+        // Verify Patch with AST Compiler & Model Re-Analysis
         updateStep('verify', {
-          details: `Verifying patch with AST compiler & sandboxed PoC (iteration ${iteration})...`,
+          details: `Verifying patch with AST compiler & model re-analysis (iteration ${iteration})...`,
         });
 
         const verifyRes = await fetch('/api/verify', {
@@ -279,7 +252,6 @@ export async function runLivePipeline(
             originalCode: effectiveCode,
             language: resolvedLanguage,
             iteration,
-            poc: currentPoc || undefined,
           }),
           signal,
         });
@@ -295,12 +267,7 @@ export async function runLivePipeline(
         if (currentVerification && currentVerification.resolved && currentVerification.syntaxOk) {
           break; // Successfully verified!
         } else {
-          // Provide rich feedback for iteration 2
-          if (currentVerification?.pocResult?.status === 'still_exploitable') {
-            feedback = `PoC Exploit Sandbox Failure: ${currentVerification.pocResult.notes}. Output: ${currentVerification.pocResult.afterPatch.output}`;
-          } else {
-            feedback = currentVerification?.notes || 'Patch failed verification';
-          }
+          feedback = currentVerification?.notes || 'Patch failed verification';
         }
       }
 

@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { applyPatchToCode } from '@/lib/diffutil';
 import { checkSyntax } from '@/lib/syntax';
 import { callNemotronJson, getModelConfig } from '@/lib/llm';
-import { FindingSchema, PatchSchema, VerificationSchema, PocHarnessSchema, Verification } from '@/lib/schemas';
+import { FindingSchema, PatchSchema, VerificationSchema, Verification } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { sanitizeUntrustedDiff } from '@/lib/prompts';
-import { verifyPatchWithPoc } from '@/lib/sandbox';
 import { getValidatedEnv } from '@/lib/env';
 
 export const maxDuration = 45;
@@ -17,7 +16,6 @@ const VerifyRequestSchema = z.object({
   originalCode: z.string().max(50000),
   language: z.string().max(50).optional().default('javascript'),
   iteration: z.number().int().min(1).max(5).default(1),
-  poc: PocHarnessSchema.optional(),
 });
 
 const ReanalysisSchema = z.object({
@@ -25,7 +23,7 @@ const ReanalysisSchema = z.object({
   notes: z.string(),
 });
 
-const VERIFY_REANALYSIS_SYSTEM_PROMPT = `You are Sentinel-CI Automated Verification Engine.
+const VERIFY_REANALYSIS_SYSTEM_PROMPT = `You are NIMROD-CI Automated Verification Engine.
 Your task is to re-analyze patched source code to determine if the specific reported security vulnerability has been completely eliminated.
 
 RULES:
@@ -59,7 +57,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { finding, patch, originalCode, language, iteration, poc } = parsed.data;
+    const { finding, patch, originalCode, language, iteration } = parsed.data;
 
     // Server-side cap on agentic retry iterations (cannot be bypassed by the client)
     const env = getValidatedEnv();
@@ -135,22 +133,10 @@ Has this security vulnerability been completely resolved? Return ONLY JSON with 
       maxTokens: 1000,
     });
 
-    let isResolved = reanalysis.data.resolved;
-    let notes = reanalysis.data.notes;
-    let pocResult = undefined;
-    let verificationMethod: Verification['verificationMethod'] =
+    const isResolved = reanalysis.data.resolved;
+    const notes = reanalysis.data.notes;
+    const verificationMethod: Verification['verificationMethod'] =
       syntaxResult.engineUsed === 'none' ? 'model_only' : 'compiler_plus_model';
-
-    if (poc && language !== 'python' && language !== 'py') {
-      pocResult = verifyPatchWithPoc(finding.id, originalCode, codeToVerify, poc, language);
-      if (pocResult.status === 'still_exploitable') {
-        isResolved = false;
-        notes = `PoC Sandbox Verification: Vulnerability remains exploitable (${pocResult.notes})`;
-      } else if (pocResult.status === 'verified') {
-        verificationMethod = 'poc_sandbox';
-        notes = `PoC Verified: Exploitable before patch, successfully neutralized in sandbox. (${notes})`;
-      }
-    }
 
     const verification: Verification = {
       findingId: finding.id,
@@ -160,7 +146,6 @@ Has this security vulnerability been completely resolved? Return ONLY JSON with 
       notes,
       syntaxEngine: syntaxResult.engineUsed,
       verificationMethod,
-      pocResult,
     };
 
     return NextResponse.json({

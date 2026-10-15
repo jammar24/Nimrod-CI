@@ -29,22 +29,22 @@ export function ExportBar({ report, onOpenPrModal, lang = 'es' }: ExportBarProps
 
   const handleExportMarkdown = () => {
     const md = formatMarkdownReport(report);
-    downloadFile(md, 'sentinel-ci-report.md', 'text/markdown');
+    downloadFile(md, 'nimrod-ci-report.md', 'text/markdown');
   };
 
   const handleExportHtml = () => {
     const html = formatHtmlReport(report);
-    downloadFile(html, 'sentinel-ci-report.html', 'text/html');
+    downloadFile(html, 'nimrod-ci-report.html', 'text/html');
   };
 
   const handleExportJson = () => {
     const json = formatJsonReport(report);
-    downloadFile(json, 'sentinel-ci-report.json', 'application/json');
+    downloadFile(json, 'nimrod-ci-report.json', 'application/json');
   };
 
   const handleExportSarif = () => {
     const sarif = formatSarifReport(report);
-    downloadFile(sarif, 'sentinel-report.sarif', 'application/json');
+    downloadFile(sarif, 'nimrod-report.sarif', 'application/json');
   };
 
   const handleCopyAllPatches = () => {

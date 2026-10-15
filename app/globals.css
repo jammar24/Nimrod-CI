@@ -51,13 +51,13 @@ pre, code, kbd, samp, .font-mono {
 }
 
 /* Hero fade-up animation (pure CSS — no hydration mismatch) */
-@keyframes sentinelFadeUp {
+@keyframes nimrodFadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.sentinel-fade-up {
-  animation: sentinelFadeUp 0.55s ease both;
+.nimrod-fade-up {
+  animation: nimrodFadeUp 0.55s ease both;
 }
 
 /* Accessibility: respect reduced motion preferences */

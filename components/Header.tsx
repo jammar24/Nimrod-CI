@@ -23,22 +23,22 @@ export function Header({ onOpenHistory, lang = 'es', onToggleLang }: HeaderProps
           className="flex items-center space-x-3 min-w-0 group cursor-pointer hover:opacity-90 transition-opacity"
           title={isEs ? 'Ir a la página principal' : 'Go to Home'}
         >
-          <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
-            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center p-1.5 shrink-0 group-hover:scale-105 transition-transform">
+            <img src="/logo-shield.png" alt="Nimrod-CI Shield" className="w-full h-full object-contain" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center space-x-2">
               <span className="font-bold text-base sm:text-lg tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
-                Sentinel-CI
+                Nimrod-CI
               </span>
               <span className="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
-                Agentic CI/CD
+                Agentic security review
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 hidden md:block truncate">
               {isEs
-                ? 'Revisor de seguridad autónomo: detecta fallas, sintetiza parches y verifica con AST + PoC'
-                : 'Autonomous security reviewer: finds flaws, synthesizes patches, and verifies with AST + PoC'}
+                ? 'Revisor de seguridad autónomo: detecta fallas, sintetiza parches y verifica con análisis AST y re-análisis del modelo.'
+                : 'Autonomous security reviewer: finds flaws, synthesizes patches, and verifies with AST checks and model re-analysis.'}
             </p>
           </div>
         </Link>
@@ -89,7 +89,7 @@ export function Header({ onOpenHistory, lang = 'es', onToggleLang }: HeaderProps
 
           {/* GitHub Repository Link */}
           <a
-            href="https://github.com/jammar24/sentinel-ci-hackathon"
+            href="https://github.com/3m3r4l/nimrod-ci"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60 hover:border-zinc-300 dark:hover:border-zinc-500 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/80 transition-all duration-150 shadow-xs"

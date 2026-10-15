@@ -53,7 +53,7 @@ export function HistoryModal({ isOpen, onClose, onSelectReport }: HistoryModalPr
           <div className="flex items-center space-x-2.5">
             <History className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base font-semibold text-zinc-100">
-              Local Analysis History
+              Nimrod-CI
             </h3>
           </div>
           <button

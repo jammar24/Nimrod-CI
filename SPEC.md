@@ -1,4 +1,4 @@
-# Sentinel-CI — Spec v2 (Next.js, solo TypeScript) para Antigravity
+# NIMROD-CI — Spec v2 (Next.js, solo TypeScript) para Antigravity
 
 > Hackathon: Nebius x NVIDIA Global AI Hackathon (Devpost)
 > Cierre: **viernes 30 oct 2026, 10:00 am PDT** (12:00 pm hora de Ecuador). Meta interna: enviar el **28 oct**.
@@ -9,7 +9,7 @@
 
 ## 0. Cómo usar este documento
 
-1. Crea la carpeta `sentinel-ci/`, ábrela en Antigravity y copia este archivo como `SPEC.md`.
+1. Crea la carpeta `NIMROD-CI/`, ábrela en Antigravity y copia este archivo como `SPEC.md`.
 2. Pega el **Prompt Maestro** (sección 15). Trabaja **por fases**, probando cada una antes de seguir.
 3. Claves SOLO en `.env.local` (nunca en el repo ni en el navegador).
 4. Desde el día 1 lleva el archivo `FEEDBACK.md` (sección 12): es tu material para el premio de feedback.
@@ -50,7 +50,7 @@ Reglas de combinación: un proyecto opta a **un** premio Overall **o** de Track,
 
 ## 3. Producto
 
-**Sentinel-CI** — *An agentic security reviewer that finds vulnerabilities in your diff, writes the patch, and proves the patch works.*
+**NIMROD-CI** — *An agentic security reviewer that finds vulnerabilities in your diff, writes the patch, and proves the patch works.*
 
 **Problema:** los PRs se revisan rápido y las vulnerabilidades se cuelan; los SAST clásicos dan falsos positivos y no arreglan nada.
 

@@ -19,8 +19,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sentinel-CI — Autonomous Agentic Security Reviewer",
-  description: "Autonomous code security reviewer powered by Nebius Token Factory & NVIDIA Nemotron with AST and sandboxed PoC verification.",
+  title: "Nimrod-CI — Autonomous Agentic Security Reviewer",
+  description: "Autonomous code security reviewer powered by Nebius Token Factory & NVIDIA Nemotron with AST checks and model re-analysis.",
 };
 
 export default function RootLayout({
@@ -39,7 +39,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var theme = localStorage.getItem('sentinel_theme');
+                var theme = localStorage.getItem('nimrod_theme');
                 if (theme === 'light') {
                   document.documentElement.classList.remove('dark');
                 } else {

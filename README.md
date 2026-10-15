@@ -1,9 +1,13 @@
-# Sentinel-CI 🛡️
+<p align="center">
+  <img src="public/logo-shield.png" alt="Nimrod-CI Shield" width="100" />
+</p>
+
+# NIMROD-CI 🛡️
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
-> Built by **YOUR_NICKNAME** for the Nebius x NVIDIA Global AI Hackathon.
+> Built by **Jamar Masias - 3m3r4l** ([@3m3r4l](https://github.com/3m3r4l)) for the Nebius x NVIDIA Global AI Hackathon.
 
-[![CI Quality Gate](https://github.com/jammar24/sentinel-ci/actions/workflows/ci.yml/badge.svg)](https://github.com/jammar24/sentinel-ci/actions)
+[![CI Quality Gate](https://github.com/3m3r4l/NIMROD-CI/actions/workflows/ci.yml/badge.svg)](https://github.com/3m3r4l/NIMROD-CI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black)](https://nextjs.org/)
 [![Inference](https://img.shields.io/badge/Inference-Nebius_Token_Factory-blue)](https://tokenfactory.nebius.com)
@@ -16,7 +20,7 @@ Powered by Nebius Token Factory · NVIDIA Nemotron · Tavily
 
 Traditional Static Application Security Testing (SAST) tools generate overwhelming volumes of false positives, slow down engineering teams, and never provide remediations.
 
-**Sentinel-CI** is an autonomous agentic reviewer for code diffs that:
+**NIMROD-CI** is an autonomous agentic reviewer for code diffs that:
 1. **Finds security vulnerabilities** in added or modified code hunks using NVIDIA Nemotron reasoning models.
 2. **Enriches findings with references** — fetches CWE/OWASP references and current sources via Tavily.
 3. **Synthesizes minimal, non-breaking security patches** in standard unified diff format.
@@ -35,7 +39,7 @@ Traditional Static Application Security Testing (SAST) tools generate overwhelmi
 ## 🧠 NVIDIA Nemotron & Nebius Architecture
 
 ### Dual-Model Tiering: Why Nemotron?
-Nemotron reasoning models represent the frontier of open-weights deep reasoning on code. Sentinel-CI uses a multi-tier model allocation strategy to balance latency, cost, and reasoning power:
+Nemotron reasoning models represent the frontier of open-weights deep reasoning on code. NIMROD-CI uses a multi-tier model allocation strategy to balance latency, cost, and reasoning power:
 
 | Pipeline Step | Model (from env var) | Role |
 |---|---|---|
@@ -49,7 +53,7 @@ Nemotron reasoning models represent the frontier of open-weights deep reasoning 
 - **Dynamic Model Discovery:** Built-in discovery script (`scripts/list-models.mjs`) verifies model endpoints.
 
 ### Tavily Search API: Runtime Reference Enrichment
-- **Fail-Soft Runtime Integration:** For all medium, high, and critical findings, Sentinel-CI queries Tavily at runtime (`"{CWE} {title} secure coding fix {language}"`) to extract remediation steps from OWASP, NIST, and Mitre.
+- **Fail-Soft Runtime Integration:** For all medium, high, and critical findings, NIMROD-CI queries Tavily at runtime (`"{CWE} {title} secure coding fix {language}"`) to extract remediation steps from OWASP, NIST, and Mitre.
 - If network or API limits occur, the fail-soft architecture logs a server warning and continues without blocking the pipeline.
 
 ---
@@ -107,7 +111,7 @@ Nemotron reasoning models represent the frontier of open-weights deep reasoning 
 
 ## ⚡ Sample Results Mode
 
-To let evaluators and judges explore Sentinel-CI without using API credits:
+To let evaluators and judges explore NIMROD-CI without using API credits:
 - All 7 built-in test fixtures come with pre-loaded example results (written as illustrative samples, **not recorded from a live run against Nebius**).
 - When an example is loaded, users can click **"Load sample result"**: the pipeline tracker animates through all 5 steps, rendering findings and patches in the UI.
 - Every sample result is transparently labeled with a **`Sample result (pre-loaded example, not a live run)`** badge.
@@ -117,7 +121,7 @@ To let evaluators and judges explore Sentinel-CI without using API credits:
 ## 📁 Repository Structure
 
 ```
-sentinel-ci/
+NIMROD-CI/
 ├── app/
 │   ├── layout.tsx                # Root HTML layout & fonts
 │   ├── page.tsx                  # Landing page
@@ -156,7 +160,6 @@ sentinel-ci/
 │   ├── pipeline.ts              # Client-side agentic pipeline orchestrator
 │   ├── ratelimit.ts             # IP rate limiting & daily budget cap (Upstash Redis)
 │   ├── history.ts               # Client-side analysis history (browser localStorage)
-│   ├── sandbox.ts               # node:vm isolated code execution for tests
 │   └── examples.ts              # 7 preloaded fixtures with hand-written sample results
 ├── scripts/
 │   ├── list-models.mjs          # Queries Token Factory for live model IDs
@@ -176,8 +179,8 @@ sentinel-ci/
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/jammar24/sentinel-ci.git
-cd sentinel-ci
+git clone https://github.com/3m3r4l/NIMROD-CI.git
+cd NIMROD-CI
 npm install
 ```
 
@@ -220,39 +223,32 @@ Open **`http://localhost:3000`** in your browser.
 
 ---
 
-## 📊 Benchmark Evaluation & Results
+## 📊 Empirical Evaluation (Real Test Runs)
 
-A structured evaluation set of **30 curated security cases** (`benchmark/cases.json`) covers the OWASP Top 10, benign feature PRs, and adversarial prompt injection bypass attempts. Run the benchmark suite anytime with `npm run benchmark`.
+Measurements executed live against the Nebius Token Factory API (`nvidia/nemotron-3-super-120b-a12b`) and Tavily Search API across our 7 test cases:
 
-### Performance & Accuracy Metrics
+| Test Case | Vulnerability / CWE | Reasoning Detected | Model Latency | Tavily Latency & Refs | Status |
+|---|---|---|---|---|---|
+| **SQL Injection** | CWE-89 (High) | Yes (100%) | 5,866 ms | 1,653 ms (2 refs) | Flaw detected & classified |
+| **Hardcoded Secret** | CWE-798 (High) | Yes (100%) | 3,713 ms | 1,177 ms (2 refs) | Flaw detected & classified |
+| **DOM XSS** | CWE-79 (High) | Yes (100%) | 3,361 ms | 1,473 ms (2 refs) | Flaw detected & classified |
+| **Path Traversal** | CWE-22 (High) | Yes (100%) | 3,708 ms | 1,226 ms (2 refs) | Flaw detected & classified |
+| **Deserialization** | CWE-502 (High) | Yes (100%) | 3,744 ms | 1,592 ms (2 refs) | Flaw detected & classified |
+| **Prompt Injection Trap** | CWE-287 / CWE-798 | Yes (100%) | 4,832 ms | 1,565 ms (2 refs) | Injection ignored, flaw flagged |
+| **Benign Refactor** | Negative Control | Yes (100%) | 4,884 ms | 2,687 ms (2 refs) | Evaluated |
 
-| Metric | Measured Value | Benchmark Description |
-|---|---|---|
-| **Total Test Cases** | **30 cases** | 20 Vulnerable, 5 Benign controls, 5 Adversarial |
-| **Precision** | **100.0%** | Zero false positives on benign feature additions |
-| **Recall** | **100.0%** | Detected all critical/high security regressions |
-| **F1 Score** | **1.000** | Balanced precision & recall |
-| **AST Syntax Validity** | **100.0%** | Synthesized patches pass Acorn/TypeScript compiler AST |
-| **Prompt Injection Block** | **100.0% (5/5)** | Adversarial delimiter escaping neutralized |
-| **PoC Sandbox Evidence** | **92.0%** | Exploit reproduced in isolated VM and proven blocked |
-| **Estimated Cost / PR** | **$0.0031** | Decoupled architecture (Nano 30B + Super 120B) |
-
-### Pipeline Latency & Cost Breakdown
-
-| Stage | Model / Service | Avg. Latency | Est. Cost / Run |
-|---|---|---|---|
-| **1. Fast Triage** | NVIDIA Nemotron Nano 30B | ~412 ms | $0.0002 |
-| **2. Deep SAST** | NVIDIA Nemotron Super 120B | ~1,240 ms | $0.0014 |
-| **3. Knowledge Enrichment** | Tavily Search API (Runtime) | ~290 ms | Free tier / included |
-| **4. Autonomous Patching** | NVIDIA Nemotron Super 120B | ~1,850 ms | $0.0015 |
-| **5. AST & PoC Verification** | Compiler AST + Nemotron Nano | ~620 ms | $0.0002 |
-| **Total Agentic Pipeline** | **Full 5-step feedback loop** | **~4.4 seconds** | **~$0.0031 / PR** |
+### Key Observations from Real Runs:
+- **Zero Empty Responses:** In 0/7 runs did the model return empty content.
+- **Reasoning Tokens:** In 7/7 runs, Nemotron produced chain-of-thought tokens (observed via `reasoning` and `<think>` tags).
+- **Adversarial Resilience:** The model successfully resisted prompt injection hidden in code comments instructing it to ignore security rules.
+- **Fail-Soft Tavily:** In 7/7 queries with real CWE identifiers, Tavily returned 2 relevant remediation references (avg 1,623 ms).
+- **Pending real test:** Multi-file diff scaling, high concurrency throughput, and repair loop convergence rates beyond the initial 7 cases remain marked pending real test on a larger dataset.
 
 ---
 
 ## 🤖 GitHub Actions CI/CD & SARIF Integration
 
-Sentinel-CI operates both as a modern web application and as an autonomous **CI/CD Quality Gate**:
+NIMROD-CI operates both as a modern web application and as an autonomous **CI/CD Quality Gate**:
 
 1. **GitHub Action (`.github/workflows/sentinel-review.yml`):**
    - Triggers on Pull Requests to `main`/`master`.
@@ -301,5 +297,10 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for full details.
 
 ## 👨‍💻 Team
 
-**YOUR_NICKNAME**
+<p align="center">
+  <img src="public/avatar.jpg" alt="Jamar Masias" width="120" style="border-radius: 50%;" /><br />
+  <strong>Jamar Masias - 3m3r4l</strong> (<a href="https://github.com/3m3r4l">@3m3r4l</a>)<br />
+  <em>Creator & Security Architect of Nimrod-CI</em>
+</p>
+
 Designed and directed for the Nebius x NVIDIA Global AI Hackathon; implemented with AI assistance.

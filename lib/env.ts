@@ -35,6 +35,19 @@ export function getValidatedEnv(): ValidatedEnv {
   }
 
   cachedEnv = result.data;
+
+  // Log warning if configured model IDs lack "nemotron"
+  if (!cachedEnv.NEBIUS_MODEL_PRIMARY.toLowerCase().includes('nemotron')) {
+    console.warn(
+      `[Config Warning] NEBIUS_MODEL_PRIMARY ("${cachedEnv.NEBIUS_MODEL_PRIMARY}") does not contain "nemotron".`
+    );
+  }
+  if (!cachedEnv.NEBIUS_MODEL_FAST.toLowerCase().includes('nemotron')) {
+    console.warn(
+      `[Config Warning] NEBIUS_MODEL_FAST ("${cachedEnv.NEBIUS_MODEL_FAST}") does not contain "nemotron".`
+    );
+  }
+
   return cachedEnv;
 }
 
@@ -46,7 +59,7 @@ export function requireNebiusApiKey(): string {
   if (!env.NEBIUS_API_KEY) {
     throw new Error(
       'NEBIUS_API_KEY is not configured. Live analysis requires a Nebius Token Factory API key. ' +
-      'To test Sentinel-CI without an API key, use "Instant replay" mode with the pre-recorded security fixtures.'
+      'To test Nimrod-CI without an API key, please use the sample results (pre-loaded examples).'
     );
   }
   return env.NEBIUS_API_KEY;

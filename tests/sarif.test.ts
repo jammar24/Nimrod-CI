@@ -51,7 +51,7 @@ describe('lib/report: formatSarifReport (OASIS SARIF v2.1.0 standard)', () => {
     expect(sarif.runs).toHaveLength(1);
 
     const run = sarif.runs[0];
-    expect(run.tool.driver.name).toBe('Sentinel-CI');
+    expect(run.tool.driver.name).toBe('Nimrod-CI');
     expect(run.tool.driver.rules).toHaveLength(1);
     expect(run.tool.driver.rules[0].id).toBe('CWE-89');
     expect(run.tool.driver.rules[0].defaultConfiguration.level).toBe('error');
@@ -65,7 +65,7 @@ describe('lib/report: formatSarifReport (OASIS SARIF v2.1.0 standard)', () => {
 
     // Patch fix integration
     expect(result.fixes).toHaveLength(1);
-    expect(result.fixes[0].description.text).toContain('Apply verified Sentinel-CI patch');
+    expect(result.fixes[0].description.text).toContain('Apply verified Nimrod-CI patch');
   });
 
   it('handles clean report with zero findings correctly', () => {

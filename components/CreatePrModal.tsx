@@ -42,7 +42,7 @@ export function CreatePrModal({
   report,
   targetFinding,
   targetPatch,
-  defaultRepo = 'jammar24/sentinel-ci-hackathon',
+  defaultRepo = '3m3r4l/nimrod-ci',
   defaultBaseBranch = 'main',
   defaultFilename = 'routes/users.js',
 }: CreatePrModalProps) {
@@ -53,7 +53,6 @@ export function CreatePrModal({
   const [prTitle, setPrTitle] = useState<string>('');
   const [prBody, setPrBody] = useState<string>('');
   const [githubToken, setGithubToken] = useState<string>('');
-  const [rememberToken, setRememberToken] = useState<boolean>(true);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -69,10 +68,6 @@ export function CreatePrModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    // Load saved PAT from localStorage
-    const savedToken = localStorage.getItem('sentinel_github_pat') || '';
-    setGithubToken(savedToken);
-
     // Pick active finding & patch
     const finding = targetFinding || report?.findings?.[0];
     const patch =
@@ -81,20 +76,20 @@ export function CreatePrModal({
 
     const cweSlug = finding?.cwe ? finding.cwe.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'sec';
     const randomSuffix = Math.random().toString(36).substring(2, 7);
-    const branchName = `sentinel-ci/fix-${cweSlug}-${randomSuffix}`;
+    const branchName = `nimrod-ci/fix-${cweSlug}-${randomSuffix}`;
     setNewBranch(branchName);
 
     const filename = defaultFilename || 'routes/users.js';
     setFilePath(filename);
 
     const title = finding
-      ? `[Sentinel-CI] Fix: ${finding.title} (${finding.cwe})`
-      : `[Sentinel-CI] Autonomous Security Patch`;
+      ? `[Nimrod-CI] Fix: ${finding.title} (${finding.cwe})`
+      : `[Nimrod-CI] Autonomous Security Patch`;
     setPrTitle(title);
 
     // Build rich PR body
     const bodyLines: string[] = [
-      `## 🛡️ Sentinel-CI Autonomous Security Patch`,
+      `## 🛡️ Nimrod-CI Autonomous Security Patch`,
       ``,
       `> **Verdict:** ${report?.verdict || 'BLOCKED'} | **Risk Score:** ${report?.riskScore ?? 85}/100`,
       ``,
@@ -109,10 +104,10 @@ export function CreatePrModal({
       `${finding?.explanation || 'Unsanitized input allows malicious operations.'}`,
       ``,
       finding?.exploitScenario ? `**Exploit Scenario:**\n${finding.exploitScenario}\n` : '',
-      `### ✅ Autonomous Verification & Guardrails`,
-      `- **AST Syntax Check:** Passed via Acorn/TypeScript compiler.`,
-      `- **Model Verification:** Verified by NVIDIA Nemotron Super 120B.`,
-      `- **Patch Confidence:** 100% syntactically valid drop-in replacement.`,
+      `### ✅ Verification: apply patch, AST syntax check, model re-analysis`,
+      `- **AST Syntax Check:** Verified via Acorn/TypeScript compiler.`,
+      `- **Model Re-analysis:** Re-checked with configured Nemotron model.`,
+      `- **Patch Integration:** Syntactically checked drop-in replacement.`,
       ``,
       `### 📚 Threat Intelligence References`,
       ...(finding?.references?.map((ref) => `- [${ref.title || ref.url}](${ref.url})`) || [
@@ -120,7 +115,7 @@ export function CreatePrModal({
       ]),
       ``,
       `---`,
-      `*Generated autonomously by [Sentinel-CI](https://github.com/jammar24/sentinel-ci-hackathon) during CI/CD security review.*`,
+      `*Generated autonomously by [Nimrod-CI](https://github.com/3m3r4l/nimrod-ci) during CI/CD security review.*`,
     ];
 
     setPrBody(bodyLines.filter(Boolean).join('\n'));
@@ -139,7 +134,7 @@ export function CreatePrModal({
       // Validate repo format
       const repoParts = repoInput.trim().split('/');
       if (repoParts.length !== 2 || !repoParts[0] || !repoParts[1]) {
-        throw new Error('Repository must be in "owner/repo" format (e.g. jammar24/sentinel-ci-hackathon)');
+        throw new Error('Repository must be in "owner/repo" format (e.g. 3m3r4l/nimrod-ci)');
       }
 
       const finding = targetFinding || report?.findings?.[0];
@@ -149,18 +144,11 @@ export function CreatePrModal({
 
       const patchedContent = patch?.patchedCode;
       if (!patchedContent) {
-        throw new Error('No patched code available to commit. Please ensure Sentinel-CI has synthesized a patch.');
+        throw new Error('No patched code available to commit. Please ensure a patch has been generated.');
       }
 
       if (!githubToken.trim()) {
         throw new Error('Please enter a GitHub Personal Access Token (PAT) with repository write permissions.');
-      }
-
-      // Save token if requested
-      if (rememberToken) {
-        localStorage.setItem('sentinel_github_pat', githubToken.trim());
-      } else {
-        localStorage.removeItem('sentinel_github_pat');
       }
 
       const res = await fetch('/api/github', {
@@ -174,7 +162,7 @@ export function CreatePrModal({
           newBranch: newBranch.trim(),
           filePath: filePath.trim(),
           patchedContent,
-          commitMessage: `security: apply verified Sentinel-CI patch for ${finding?.cwe || 'vulnerability'}`,
+          commitMessage: `security: apply verified Nimrod-CI patch for ${finding?.cwe || 'vulnerability'}`,
           prTitle: prTitle.trim(),
           prBody: prBody.trim(),
           token: githubToken.trim(),
@@ -244,7 +232,7 @@ export function CreatePrModal({
                   Pull Request Created Successfully!
                 </h3>
                 <p className="text-xs text-zinc-300 mt-1 max-w-md mx-auto">
-                  Sentinel-CI created branch <code className="text-emerald-400 font-mono">{createdPr.branch}</code> and opened PR #{createdPr.prNumber} on GitHub.
+                  NIMROD-CI created branch <code className="text-emerald-400 font-mono">{createdPr.branch}</code> and opened PR #{createdPr.prNumber} on GitHub.
                 </p>
               </div>
 
@@ -303,7 +291,7 @@ export function CreatePrModal({
                     required
                     value={repoInput}
                     onChange={(e) => setRepoInput(e.target.value)}
-                    placeholder="jammar24/sentinel-ci-hackathon"
+                    placeholder="3m3r4l/nimrod-ci"
                     className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
                   />
                 </div>
@@ -348,7 +336,7 @@ export function CreatePrModal({
                     required
                     value={newBranch}
                     onChange={(e) => setNewBranch(e.target.value)}
-                    placeholder="sentinel-ci/fix-cwe-89-sqli"
+                    placeholder="NIMROD-CI/fix-cwe-89-sqli"
                     className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
                   />
                 </div>
@@ -364,7 +352,7 @@ export function CreatePrModal({
                   required
                   value={prTitle}
                   onChange={(e) => setPrTitle(e.target.value)}
-                  placeholder="[Sentinel-CI] Fix SQL Injection"
+                  placeholder="[NIMROD-CI] Fix SQL Injection"
                   className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs"
                 />
               </div>
@@ -376,7 +364,7 @@ export function CreatePrModal({
                     GitHub Personal Access Token (PAT) <span className="text-emerald-400">*</span>
                   </label>
                   <a
-                    href="https://github.com/settings/tokens/new?scopes=repo&description=Sentinel-CI-Hackathon"
+                    href="https://github.com/settings/tokens/new?scopes=repo&description=Nimrod-CI-Review"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[11px] text-cyan-400 hover:text-cyan-300 underline inline-flex items-center gap-1"
@@ -391,22 +379,14 @@ export function CreatePrModal({
                     required
                     value={githubToken}
                     onChange={(e) => setGithubToken(e.target.value)}
-                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx or github_pat_..."
+                    placeholder="DEMO_SECRET_not_a_real_key_1234 or your PAT..."
                     className="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
                   />
                   <Key className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
                 </div>
                 <div className="flex items-center justify-between mt-1 text-[11px] text-zinc-500">
                   <span>Requires permissions: <code className="text-zinc-400">repo</code> (or fine-grained: contents & PR write)</span>
-                  <label className="flex items-center space-x-1.5 cursor-pointer text-zinc-400 hover:text-zinc-300">
-                    <input
-                      type="checkbox"
-                      checked={rememberToken}
-                      onChange={(e) => setRememberToken(e.target.checked)}
-                      className="rounded bg-zinc-950 border-zinc-800 text-emerald-500 focus:ring-0"
-                    />
-                    <span>Remember token</span>
-                  </label>
+                  <span className="text-[11px] text-zinc-400">Kept in memory for this tab only (never persisted or logged)</span>
                 </div>
               </div>
 

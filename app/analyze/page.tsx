@@ -40,16 +40,35 @@ export default function AnalyzePage() {
   const [currentFilename, setCurrentFilename] = useState<string>('source.js');
   const [lang, setLang] = useState<'es' | 'en'>('en');
 
-  // Load saved language preference
+  // Load saved language preference and runtime model configuration
   useEffect(() => {
-    const savedLang = localStorage.getItem('sentinel_lang') as 'es' | 'en' | null;
+    const savedLang = localStorage.getItem('nimrod_lang') as 'es' | 'en' | null;
     if (savedLang) setLang(savedLang);
+
+    fetch('/api/health')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.models) {
+          const fast = data.models.fast || 'not configured';
+          const primary = data.models.primary || 'not configured';
+          setPipelineSteps((prev) =>
+            prev.map((step) => {
+              if (step.id === 'triage') return { ...step, model: fast };
+              if (step.id === 'analyze') return { ...step, model: primary };
+              if (step.id === 'patch') return { ...step, model: primary };
+              if (step.id === 'verify') return { ...step, model: `Compiler AST + ${fast}` };
+              return step;
+            })
+          );
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleToggleLang = () => {
     const newLang = lang === 'es' ? 'en' : 'es';
     setLang(newLang);
-    localStorage.setItem('sentinel_lang', newLang);
+    localStorage.setItem('nimrod_lang', newLang);
   };
 
   const isEs = lang === 'es';
@@ -180,7 +199,7 @@ export default function AnalyzePage() {
         targetFinding={prModalFinding}
         targetPatch={prModalPatch}
         defaultRepo={
-          gitRepoContext ? `${gitRepoContext.owner}/${gitRepoContext.repo}` : 'jammar24/sentinel-ci-hackathon'
+          gitRepoContext ? `${gitRepoContext.owner}/${gitRepoContext.repo}` : '3m3r4l/nimrod-ci'
         }
         defaultBaseBranch={gitRepoContext?.baseBranch || 'main'}
         defaultFilename={gitRepoContext?.filePath || currentFilename}
@@ -203,7 +222,7 @@ export default function AnalyzePage() {
 
           {/* RIGHT COLUMN: Pipeline Tracker, Verdict & Findings (7 Cols) */}
           <div className="lg:col-span-7 space-y-6">
-            {/* Error Notification Banner with Instant Replay CTA */}
+            {/* Error Notification Banner with Sample Result CTA */}
             {errorMessage && (
               <div
                 className="p-5 rounded-2xl border border-rose-500/30 bg-rose-50 dark:bg-rose-950/30 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
@@ -222,10 +241,10 @@ export default function AnalyzePage() {
                 <button
                   type="button"
                   onClick={() => handleInstantReplay(SECURITY_FIXTURES[0])}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-700 dark:text-rose-200 text-xs font-medium whitespace-nowrap self-end sm:self-auto cursor-pointer"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-medium whitespace-nowrap self-end sm:self-auto cursor-pointer"
                 >
                   <Zap className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                  <span>{isEs ? 'Probar Repetición Instantánea' : 'Try Instant Replay'}</span>
+                  <span>{isEs ? 'Cargar resultado de muestra' : 'Load sample result'}</span>
                 </button>
               </div>
             )}
@@ -314,8 +333,8 @@ export default function AnalyzePage() {
                 </h3>
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-lg mt-2 leading-relaxed">
                   {isEs
-                    ? 'Sentinel-CI ejecuta una revisión agéntica de 5 fases: Triaje → Análisis SAST → Enriquecimiento Tavily → Parcheo Autónomo → Verificación AST.'
-                    : 'Sentinel-CI executes a 5-step agentic review: Triage → Deep Analysis → Tavily Enrichment → Autonomous Patching → AST & Re-analysis Verification.'}
+                    ? 'Nimrod-CI ejecuta una revisión agéntica de 5 fases: Triaje → Análisis SAST → Enriquecimiento Tavily → Parcheo Autónomo → Verificación AST.'
+                    : 'Nimrod-CI executes a 5-step agentic review: Triage → Deep Analysis → Tavily Enrichment → Autonomous Patching → AST & Re-analysis Verification.'}
                 </p>
 
                 <div className="mt-6 w-full max-w-md">

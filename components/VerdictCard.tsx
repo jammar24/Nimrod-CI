@@ -77,7 +77,7 @@ export function VerdictCard({
               )}
             </div>
             <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mt-1">
-              {isEs ? 'Evaluación de Seguridad Sentinel' : 'Sentinel Security Assessment'}
+              {isEs ? 'Evaluación de Seguridad Nimrod' : 'Nimrod Security Assessment'}
             </h3>
           </div>
         </div>
