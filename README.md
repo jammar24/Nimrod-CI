@@ -1,4 +1,7 @@
 <p align="center">
+
+  <img width="1792" height="592" alt="Nimrod-CI Banner" src="https://github.com/user-attachments/assets/be8d0460-f5ea-4c92-b6c7-a22a7508c9a5" />
+
   <img src="public/logo-shield.png" alt="Nimrod-CI Shield" width="100" />
 </p>
 
