@@ -1,13 +1,13 @@
 # Security Policy & Privacy Architecture
 
-NIMROD-CI is an autonomous static security review agent designed for Pull Requests. Because NIMROD-CI inspects code for vulnerabilities, its own security posture and data privacy practices must be exemplary.
+Nimrod-CI is an autonomous static security review agent designed for Pull Requests. Because Nimrod-CI inspects code for vulnerabilities, its own security posture and data privacy practices must be exemplary.
 
 ---
 
 ## 1. Vulnerability Reporting
 
 If you discover a security vulnerability or bypass within NIMROD-CI, please report it responsibly:
-- **Email:** `security@3m3r4l.dev` (or Jamar Masias - 3m3r4l on GitHub: [github.com/3m3r4l](https://github.com/3m3r4l))
+- **Email:** `emeralsec@gmail.com` (or Jamar Masias  on GitHub: [github.com/jammar24](https://github.com/jammar24))
 - **Response SLA:** Acknowledgment within 24 hours; initial remediation plan within 72 hours.
 - Please do **not** open public GitHub issues for unpatched critical vulnerabilities or zero-days.
 
