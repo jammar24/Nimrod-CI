@@ -250,6 +250,35 @@ Measurements executed live against the Nebius Token Factory API (`nvidia/nemotro
 - **Fail-Soft Tavily:** In 7/7 queries with real CWE identifiers, Tavily returned 2 relevant remediation references (avg 1,623 ms).
 - **Pending real test:** Multi-file diff scaling, high concurrency throughput, and repair loop convergence rates beyond the initial 7 cases remain marked pending real test on a larger dataset.
 
+## 📡 REST API Specification
+
+Nimrod-CI provides a modular, production-ready REST API for standalone integration into CI runners, IDE extensions, and automation scripts:
+
+| Method | Endpoint | Description | Engine / Model |
+|---|---|---|---|
+| `GET` | `/api/health` | Service health, models status & environment diagnostics | System Diagnostic |
+| `GET` | `/api/examples` | Curated security vulnerability test fixtures | Test Suite |
+| `POST` | `/api/triage` | Fast screening & suspicious hunk extraction | `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` |
+| `POST` | `/api/analyze` | Deep SAST reasoning & optional 1-shot full pipeline (`fullPipeline: true`) | `nvidia/nemotron-3-super-120b-a12b` |
+| `POST` | `/api/enrich` | Live threat intelligence & OWASP references | Tavily Search API |
+| `POST` | `/api/patch` | Autonomous unified diff patch synthesis | `nvidia/nemotron-3-super-120b-a12b` |
+| `POST` | `/api/verify` | AST compiler syntax check + model re-analysis | Acorn / TS Compiler + Nemotron Nano |
+| `GET` | `/api/github` | Fetch GitHub PR diff & metadata | GitHub REST API v3 |
+| `POST` | `/api/github` | Create security branch & open remediation PR | GitHub Git Data API |
+
+### Quickstart: Scan a Diff via cURL
+```bash
+curl -X POST https://nimrod-ci.vercel.app/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "diff": "--- a/auth.js\\n+++ b/auth.js\\n@@ -1,2 +1,2 @@\\n- db.query(\\"SELECT * FROM users WHERE id = $1\\", [id]);\\n+ db.query(\\"SELECT * FROM users WHERE id=\\" + req.query.id);",
+    "language": "javascript",
+    "fullPipeline": true
+  }'
+```
+
+> For interactive schema explorers, parameter definitions, and response previews, explore the in-app **[Documentation & API Center](/docs)**.
+
 ---
 
 ## 🤖 GitHub Actions CI/CD & SARIF Integration

@@ -1,53 +1,73 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
-import { POST } from '../app/api/github/route';
+import { POST, GET } from '../app/api/github/route';
 
 describe('/api/github Route Handler', () => {
-  it('returns 400 for unknown or missing action', async () => {
-    const req = new NextRequest('http://localhost:3000/api/github', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'unknown-action' }),
+  describe('GET handler', () => {
+    it('returns 400 when url query param is missing', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github');
+      const res = await GET(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Missing or invalid "url"');
     });
 
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toContain('Unknown action');
+    it('returns 400 for invalid GitHub PR URL query', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github?url=invalid-pr-url');
+      const res = await GET(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Invalid GitHub Pull Request URL');
+    });
   });
 
-  it('returns 400 when fetch-pr is missing prUrl', async () => {
-    const req = new NextRequest('http://localhost:3000/api/github', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'fetch-pr' }),
+  describe('POST handler', () => {
+    it('returns 400 for unknown or missing action', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'unknown-action' }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Unknown action');
     });
 
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toContain('Missing or invalid "prUrl"');
-  });
+    it('returns 400 when fetch-pr is missing prUrl', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'fetch-pr' }),
+      });
 
-  it('returns 400 when fetch-pr receives invalid URL format', async () => {
-    const req = new NextRequest('http://localhost:3000/api/github', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'fetch-pr', prUrl: 'not_a_valid_pr' }),
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Missing or invalid "prUrl"');
     });
 
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toContain('Invalid GitHub Pull Request URL');
-  });
+    it('returns 400 when fetch-pr receives invalid URL format', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'fetch-pr', prUrl: 'not_a_valid_pr' }),
+      });
 
-  it('returns 400 when create-pr is missing required fields', async () => {
-    const req = new NextRequest('http://localhost:3000/api/github', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'create-pr', owner: 'test' }),
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Invalid GitHub Pull Request URL');
     });
 
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toContain('Missing required fields');
+    it('returns 400 when create-pr is missing required fields', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'create-pr', owner: 'test' }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Missing required fields');
+    });
   });
 });

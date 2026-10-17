@@ -4,6 +4,7 @@ import { callNemotronJson, getModelConfig } from '@/lib/llm';
 import { ANALYZE_SYSTEM_PROMPT, formatAnalyzeUserPrompt } from '@/lib/prompts';
 import { AnalyzeResultSchema, RiskyHunkSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
+import { assembleReport } from '@/lib/report';
 
 export const maxDuration = 60; // Up to 60s for deep SAST reasoning
 
@@ -11,6 +12,7 @@ const AnalyzeRequestSchema = z.object({
   diff: z.string().min(1, 'Diff cannot be empty').max(20000, 'Diff exceeds maximum allowed limit'),
   language: z.string().max(50).optional().default('auto'),
   riskyHunks: z.array(RiskyHunkSchema).max(50).optional(),
+  fullPipeline: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { diff, language, riskyHunks } = parsed.data;
+    const { diff, language, riskyHunks, fullPipeline } = parsed.data;
     const { primary: modelPrimary, maxDiffChars } = getModelConfig();
 
     if (diff.length > maxDiffChars) {
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
       maxTokens: 3000,
     });
 
-    return NextResponse.json({
+    const responsePayload: Record<string, any> = {
       findings: result.data.findings,
       telemetry: {
         modelUsed: result.modelUsed,
@@ -64,7 +66,18 @@ export async function POST(req: NextRequest) {
         tokens: result.tokens,
         hadCorrectiveRetry: result.hadCorrectiveRetry,
       },
-    });
+    };
+
+    if (fullPipeline) {
+      responsePayload.report = assembleReport({
+        findings: result.data.findings,
+        patches: [],
+        verifications: [],
+        durationMs: result.durationMs,
+      });
+    }
+
+    return NextResponse.json(responsePayload);
   } catch (error: any) {
     console.error('Analyze endpoint error:', error);
     return NextResponse.json(

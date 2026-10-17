@@ -60,6 +60,16 @@ pre, code, kbd, samp, .font-mono {
   animation: nimrodFadeUp 0.55s ease both;
 }
 
+/* Gauge progress loading shimmer */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.2s infinite ease-in-out;
+}
+
 /* Accessibility: respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

@@ -6,6 +6,33 @@ import {
   CreatePrPayload,
 } from '@/lib/github';
 
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const prUrl = searchParams.get('url') || searchParams.get('prUrl');
+    const token =
+      req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ||
+      searchParams.get('token') ||
+      undefined;
+
+    if (!prUrl) {
+      return NextResponse.json(
+        { error: 'Missing or invalid "url" or "prUrl" query parameter' },
+        { status: 400 }
+      );
+    }
+
+    const prRef = parseGitHubPrUrl(prUrl);
+    const prDetails = await fetchGitHubPr(prRef, token);
+    return NextResponse.json({ success: true, data: prDetails });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || 'GitHub PR fetch failed' },
+      { status: error.status || 400 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

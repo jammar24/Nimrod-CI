@@ -102,8 +102,39 @@ export function VerdictCard({
         {summary}
       </p>
 
-      {/* Visual Risk Meter */}
-      <RiskMeter score={riskScore} />
+      {/* Calculate detected vulnerability risk score from findings */}
+      {(() => {
+        const crit = stats?.criticalCount || 0;
+        const high = stats?.highCount || 0;
+        const med = stats?.mediumCount || 0;
+        const low = stats?.lowCount || 0;
+        const totalFindings = stats?.totalFindings || 0;
+        const verifiedCount = stats?.verifiedPatchesCount || 0;
+        const isMitigated = totalFindings > 0 && verifiedCount === totalFindings;
+
+        let detectedScore = riskScore;
+        if (totalFindings > 0) {
+          if (crit > 0) {
+            detectedScore = Math.min(100, 85 + (crit - 1) * 10 + high * 5);
+          } else if (high > 0) {
+            detectedScore = Math.min(90, 75 + (high - 1) * 10 + med * 5);
+          } else if (med > 0) {
+            detectedScore = Math.min(60, 45 + (med - 1) * 10 + low * 5);
+          } else if (low > 0) {
+            detectedScore = Math.min(30, 20 + (low - 1) * 5);
+          }
+        }
+
+        return (
+          <RiskMeter
+            score={riskScore}
+            detectedScore={detectedScore}
+            isMitigated={isMitigated}
+            totalFindings={totalFindings}
+            lang={lang}
+          />
+        );
+      })()}
     </div>
   );
 }
