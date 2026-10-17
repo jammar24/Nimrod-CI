@@ -26,9 +26,9 @@ export function RiskMeter({ score }: RiskMeterProps) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between text-xs font-medium mb-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-medium gap-1 mb-1.5">
         <span className="text-zinc-400">Risk Meter (0 – 100)</span>
-        <span className={`${textColor} font-bold text-sm`}>
+        <span className={`${textColor} font-bold text-xs sm:text-sm`}>
           {boundedScore}/100 · {badgeText}
         </span>
       </div>
@@ -43,8 +43,8 @@ export function RiskMeter({ score }: RiskMeterProps) {
 
       <div className="flex justify-between text-[10px] text-zinc-400 mt-1 font-mono">
         <span>0 (Zero Risk)</span>
-        <span>50 (Moderate)</span>
-        <span>100 (Highest Risk)</span>
+        <span className="hidden sm:inline">50 (Moderate)</span>
+        <span>100 (Highest)</span>
       </div>
     </div>
   );

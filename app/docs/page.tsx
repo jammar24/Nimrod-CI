@@ -38,16 +38,25 @@ export default function DocsPage() {
             </Link>
           </div>
           
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            <Link href="/" className="hover:text-zinc-900 dark:text-white transition-colors flex items-center gap-1.5">
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home</span>
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <Link
+              href="/"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60 hover:border-zinc-300 dark:hover:border-zinc-500 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/80 transition-all cursor-pointer shadow-xs"
+              title="Back to Home"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Back to Home</span>
             </Link>
-            <Link href="/analyze" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+
+            <Link
+              href="/analyze"
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-xs transition-all shadow-xs whitespace-nowrap"
+            >
               Try it now
             </Link>
+
             <ThemeToggle />
-          </nav>
+          </div>
         </div>
       </header>
 
@@ -194,7 +203,7 @@ export default function DocsPage() {
           </div>
 
           <div className="flex items-center space-x-6 text-sm text-zinc-600 dark:text-zinc-400">
-            <a href="https://github.com/3m3r4l/nimrod-ci" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:text-white transition-colors">
+            <a href="https://github.com/jammar24/Nimrod-CI" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:text-white transition-colors">
               Repository
             </a>
             <span>MIT License</span>

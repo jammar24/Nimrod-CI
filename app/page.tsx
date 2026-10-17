@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { Footer } from '../components/Footer';
-import { ShieldCheck, GitPullRequest, Menu, X, CheckCircle, Code2, Cpu, Globe } from 'lucide-react';
+import { ShieldCheck, GitPullRequest, Menu, X, CheckCircle, Code2, Cpu, Globe, ExternalLink } from 'lucide-react';
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -86,7 +86,7 @@ export default function LandingPage() {
             <Link href="/docs#api" className="hover:text-zinc-900 dark:hover:text-white transition-colors">{t.api}</Link>
             <a href="#team" className="hover:text-zinc-900 dark:hover:text-white transition-colors">{t.team}</a>
             <a
-              href="https://github.com/3m3r4l/nimrod-ci"
+              href="https://github.com/jammar24/Nimrod-CI"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1.5"
@@ -168,26 +168,26 @@ export default function LandingPage() {
 
           {/* Pure-CSS fade-up — no SSR mismatch */}
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center nimrod-hero-container">
-            <h1 className="nimrod-fade-up text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-6" style={{ animationDelay: '0ms' }}>
+            <h1 className="nimrod-fade-up text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-6" style={{ animationDelay: '0ms' }}>
               {t.heroTitle1}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400">
                 {t.heroTitleGradient}
               </span>
               {t.heroTitle2}
             </h1>
-            <p className="nimrod-fade-up text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10 max-w-2xl mx-auto" style={{ animationDelay: '150ms' }}>
+            <p className="nimrod-fade-up text-base sm:text-xl text-zinc-600 dark:text-zinc-400 mb-8 sm:mb-10 max-w-2xl mx-auto" style={{ animationDelay: '150ms' }}>
               {t.heroSubtitle}
             </p>
-            <div className="nimrod-fade-up flex flex-col sm:flex-row justify-center items-center gap-4" style={{ animationDelay: '300ms' }}>
+            <div className="nimrod-fade-up flex flex-col sm:flex-row justify-center items-center gap-4 w-full sm:w-auto" style={{ animationDelay: '300ms' }}>
               <Link
                 href="/analyze"
-                className="px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-base transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-base transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] text-center"
               >
                 {t.tryNow}
               </Link>
               <Link
                 href="/docs"
-                className="px-8 py-3.5 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-base transition-all"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-base transition-all text-center"
               >
                 {t.readDocs}
               </Link>
@@ -298,17 +298,17 @@ export default function LandingPage() {
                 : 'Meet the team behind the development and architecture of Nimrod-CI'}
             </p>
 
-            <div className="inline-block max-w-md w-full p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md shadow-xl transition-all hover:border-emerald-500/40">
+            <div className="inline-block max-w-md w-full p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md shadow-xl transition-all hover:border-emerald-500/40">
               <div className="w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20 bg-zinc-950">
                 <img
                   src="/avatar.jpg"
-                  alt="Jamar Masias - 3m3r4l"
+                  alt="Jamar Masias - @jammar24"
                   className="w-full h-full object-cover"
                 />
               </div>
               <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">Jamar Masias</h3>
               <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold my-2 font-mono">
-                @3m3r4l
+                @jammar24
               </div>
               <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                 {t.teamRole}
@@ -316,15 +316,24 @@ export default function LandingPage() {
               <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-6">
                 {t.teamBio}
               </p>
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
                 <a
-                  href="https://github.com/3m3r4l"
+                  href="https://github.com/jammar24"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shadow-sm"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shadow-sm cursor-pointer"
                 >
                   <GitPullRequest className="w-3.5 h-3.5" />
-                  GitHub Profile (@3m3r4l)
+                  GitHub (@jammar24)
+                </a>
+                <a
+                  href="https://github.com/jammar24/Nimrod-CI"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition-colors shadow-sm cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  jammar24/Nimrod-CI
                 </a>
               </div>
             </div>

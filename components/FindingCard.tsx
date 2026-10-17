@@ -118,7 +118,7 @@ export function FindingCard({
                 </span>
               )}
 
-              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono truncate max-w-[130px] sm:max-w-xs">
                 {finding.file}:{finding.lineStart || 1}
               </span>
             </div>
@@ -232,7 +232,7 @@ export function FindingCard({
                   <button
                     type="button"
                     onClick={() => onOpenPrModal(finding, patch)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                    className="w-full sm:w-auto min-h-[38px] flex items-center justify-center space-x-1.5 px-3.5 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
                     title={isEs ? 'Crear Pull Request con este parche' : 'Open Pull Request with this fix on GitHub'}
                   >
                     <GitPullRequest className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />

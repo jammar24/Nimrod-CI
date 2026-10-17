@@ -8,6 +8,10 @@
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
 > Built by **Jamar Masias** ([@jammar24](https://github.com/jammar24)) for the Nebius x NVIDIA Global AI Hackathon.
+<<<<<<< HEAD
+=======
+> **Repository:** [https://github.com/jammar24/Nimrod-CI](https://github.com/jammar24/Nimrod-CI)
+>>>>>>> 4ff4dcd (feact:visual.new component responsive detail)
 
 [![CI Quality Gate](https://github.com/jammar24/Nimrod-CI/actions/workflows/ci.yml/badge.svg)](https://github.com/jammar24/Nimrod-CI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
@@ -301,8 +305,14 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for full details.
 
 <p align="center">
   <img src="public/avatar.jpg" alt="Jamar Masias" width="120" style="border-radius: 50%;" /><br />
+<<<<<<< HEAD
   <strong>Jamar Masias </strong> (<a href="https://github.com/jammmar24">@jammar24</a>)<br />
   <em>Creator & Security Architect of Nimrod-CI</em>
+=======
+  <strong>Jamar Masias</strong> (<a href="https://github.com/jammar24">@jammar24</a>)<br />
+  <em>Creator & Security Architect of Nimrod-CI</em><br />
+  <a href="https://github.com/jammar24/Nimrod-CI">github.com/jammar24/Nimrod-CI</a>
+>>>>>>> 4ff4dcd (feact:visual.new component responsive detail)
 </p>
 
 Designed and directed for the Nebius x NVIDIA Global AI Hackathon; implemented with AI assistance.

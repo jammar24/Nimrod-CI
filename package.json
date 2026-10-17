@@ -1,7 +1,7 @@
 {
   "name": "nimrod-ci",
   "version": "0.1.0",
-  "author": "Jamar Masias - 3m3r4l",
+  "author": "Jamar Masias - @jammar24",
   "private": true,
   "scripts": {
     "dev": "next dev",

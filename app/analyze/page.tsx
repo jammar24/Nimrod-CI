@@ -86,6 +86,15 @@ export default function AnalyzePage() {
   } | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToResultsOnMobile = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
 
   // Handle live pipeline execution against Nebius endpoints
   const handleRunLive = async (diff: string, originalCode: string, language: string, filename?: string) => {
@@ -95,6 +104,7 @@ export default function AnalyzePage() {
     setIsReplayMode(false);
     setTotalDuration(undefined);
     if (filename) setCurrentFilename(filename);
+    scrollToResultsOnMobile();
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -135,6 +145,7 @@ export default function AnalyzePage() {
     setIsReplayMode(true);
     setTotalDuration(undefined);
     setCurrentFilename(fixture.name.toLowerCase().replace(/\s+/g, '-') + '.js');
+    scrollToResultsOnMobile();
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -199,7 +210,7 @@ export default function AnalyzePage() {
         targetFinding={prModalFinding}
         targetPatch={prModalPatch}
         defaultRepo={
-          gitRepoContext ? `${gitRepoContext.owner}/${gitRepoContext.repo}` : '3m3r4l/nimrod-ci'
+          gitRepoContext ? `${gitRepoContext.owner}/${gitRepoContext.repo}` : 'jammar24/Nimrod-CI'
         }
         defaultBaseBranch={gitRepoContext?.baseBranch || 'main'}
         defaultFilename={gitRepoContext?.filePath || currentFilename}
@@ -207,8 +218,8 @@ export default function AnalyzePage() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* LEFT COLUMN: Code Diff & Before/After Input Panel (5 Cols) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24">
+          {/* LEFT COLUMN: Code Diff & Before/After Input Panel (6 Cols on lg, 5 on xl) */}
+          <div className="lg:col-span-6 xl:col-span-5 lg:sticky lg:top-24 min-w-0">
             <InputPanel
               onRunLive={handleRunLive}
               onInstantReplay={handleInstantReplay}
@@ -220,8 +231,8 @@ export default function AnalyzePage() {
             />
           </div>
 
-          {/* RIGHT COLUMN: Pipeline Tracker, Verdict & Findings (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* RIGHT COLUMN: Pipeline Tracker, Verdict & Findings (6 Cols on lg, 7 on xl) */}
+          <div ref={resultsRef} className="lg:col-span-6 xl:col-span-7 space-y-6 min-w-0">
             {/* Error Notification Banner with Sample Result CTA */}
             {errorMessage && (
               <div

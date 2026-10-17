@@ -41,34 +41,37 @@ export function Footer({ durationMs, isReplay, lang = 'en' }: FooterProps) {
           </span>
           {isReplay && (
             <span className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 text-[10px] font-semibold">
-              {isEs
-                ? 'Resultado de muestra (ejemplo pre-cargado, no una ejecución en vivo)'
-                : 'Sample result (pre-loaded example, not a live run)'}
+              <span className="sm:hidden">{isEs ? 'Muestra' : 'Sample'}</span>
+              <span className="hidden sm:inline">
+                {isEs
+                  ? 'Resultado de muestra (ejemplo pre-cargado)'
+                  : 'Sample result (pre-loaded example)'}
+              </span>
             </span>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2 text-[11px] text-zinc-500 dark:text-zinc-400">
           <div>
             <span>{isEs ? 'Triaje y Verificación: ' : 'Triage & Verification: '}</span>
             <span className="font-mono text-zinc-800 dark:text-zinc-300">{models.fast}</span>
           </div>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <div>
             <span>{isEs ? 'Análisis y Parcheo: ' : 'Analysis & Patching: '}</span>
             <span className="font-mono text-zinc-800 dark:text-zinc-300">{models.primary}</span>
           </div>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <div>
             <span>{isEs ? 'Enriquecimiento: ' : 'Enrichment: '}</span>
             <span className="font-mono text-zinc-800 dark:text-zinc-300">Tavily Search</span>
           </div>
           {durationMs !== undefined && (
             <>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <div className="flex items-center space-x-1 text-emerald-600 dark:text-emerald-400 font-mono font-medium">
                 <Zap className="w-3 h-3" />
-                <span>{isEs ? 'Total: ' : 'Total: '}{durationMs}ms</span>
+                <span>Total: {durationMs}ms</span>
               </div>
             </>
           )}
@@ -76,8 +79,8 @@ export function Footer({ durationMs, isReplay, lang = 'en' }: FooterProps) {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 text-center text-[11px] text-zinc-500">
         {isEs ? 'Creado por' : 'Built by'}{' '}
-        <a href="https://github.com/3m3r4l" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-medium">
-          Jamar Masias - 3m3r4l
+        <a href="https://github.com/jammar24" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-medium">
+          Jamar Masias - @jammar24
         </a>{' '}
         · MIT License
       </div>

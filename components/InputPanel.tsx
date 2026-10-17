@@ -70,7 +70,7 @@ export function InputPanel({
 
   // GitHub PR mode state
   const [prUrlInput, setPrUrlInput] = useState<string>(
-    'https://github.com/3m3r4l/nimrod-ci/pull/1'
+    'https://github.com/jammar24/Nimrod-CI/pull/1'
   );
   const [prTokenInput, setPrTokenInput] = useState<string>('');
   const [isFetchingPr, setIsFetchingPr] = useState(false);
@@ -287,71 +287,71 @@ export function InputPanel({
 
   return (
     <div className="w-full flex flex-col rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/40 backdrop-blur-md p-4 sm:p-5 h-full shadow-sm dark:shadow-none transition-colors">
-      {/* Top Controls: Mode Switcher & Example Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-800/80">
-        {/* Mode Toggle */}
-        <div className="flex p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 self-start overflow-x-auto max-w-full shrink-0">
+      {/* Top Controls: Mode Switcher & Example Selector in two clean rows */}
+      <div className="flex flex-col gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-800/80">
+        {/* Mode Toggle: 2x2 grid on mobile, 4 columns on sm+ */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 w-full gap-1">
           <button
             type="button"
             onClick={() => setMode('diff')}
-            className={`flex shrink-0 whitespace-nowrap items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center justify-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               mode === 'diff'
                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <FileCode2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{isEs ? 'Diff Unificado' : 'Unified Diff'}</span>
+            <FileCode2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="truncate">{isEs ? 'Diff Unificado' : 'Unified Diff'}</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('file')}
-            className={`flex shrink-0 whitespace-nowrap items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center justify-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               mode === 'file'
                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <Upload className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-            <span>{isEs ? 'Subir Archivo' : 'Upload File'}</span>
+            <Upload className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+            <span className="truncate">{isEs ? 'Subir Archivo' : 'Upload File'}</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('before_after')}
-            className={`flex shrink-0 whitespace-nowrap items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center justify-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               mode === 'before_after'
                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <ArrowLeftRight className="w-3.5 h-3.5 text-amber-500" />
-            <span>{isEs ? 'Antes / Después' : 'Before / After'}</span>
+            <ArrowLeftRight className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span className="truncate">{isEs ? 'Antes / Después' : 'Before / After'}</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('github')}
-            className={`flex shrink-0 whitespace-nowrap items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center justify-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               mode === 'github'
                 ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs border border-emerald-500/30'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-300'
             }`}
           >
-            <GitPullRequest className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{isEs ? 'PR GitHub' : 'GitHub PR'}</span>
+            <GitPullRequest className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="truncate">{isEs ? 'PR GitHub' : 'GitHub PR'}</span>
           </button>
         </div>
 
-        {/* Load Example Dropdown */}
-        <div className="flex items-center space-x-2">
+        {/* Load Example Dropdown (Always full width in its own row) */}
+        <div className="flex items-center space-x-2 w-full min-w-0">
           <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <label htmlFor="example-select" className="text-xs font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
+          <label htmlFor="example-select" className="text-xs font-medium text-zinc-700 dark:text-zinc-300 shrink-0 whitespace-nowrap">
             {isEs ? 'Cargar ejemplo:' : 'Load example:'}
           </label>
           <select
             id="example-select"
             value={selectedFixture?.id || ''}
             onChange={handleSelectExample}
-            className="text-xs font-medium bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 w-full sm:w-auto shadow-xs"
+            className="text-xs font-medium bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 flex-1 min-w-0 shadow-xs truncate"
           >
             {SECURITY_FIXTURES.map((fixture) => (
               <option key={fixture.id} value={fixture.id}>
@@ -372,7 +372,7 @@ export function InputPanel({
                 value={prUrlInput}
                 onChange={(e) => setPrUrlInput(e.target.value)}
                 placeholder="https://github.com/owner/repo/pull/123 or owner/repo#123"
-                className="w-full pl-8 pr-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                className="w-full pl-8 pr-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base sm:text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
               <GithubIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-2.5" />
             </div>
@@ -403,7 +403,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => {
-                const url = 'https://github.com/3m3r4l/nimrod-ci/pull/1';
+                const url = 'https://github.com/jammar24/Nimrod-CI/pull/1';
                 setPrUrlInput(url);
                 handleFetchPr(url);
               }}
@@ -492,18 +492,18 @@ export function InputPanel({
       )}
 
       {/* Language Selector & Character Counter */}
-      <div className="flex flex-wrap items-center justify-between py-3 text-xs text-zinc-600 dark:text-zinc-400 gap-2">
-        <div className="flex items-center space-x-2">
-          <span>{isEs ? 'Lenguaje:' : 'Language:'}</span>
+      <div className="flex flex-wrap items-center justify-between py-2.5 text-xs text-zinc-600 dark:text-zinc-400 gap-2">
+        <div className="flex items-center space-x-2 min-w-0">
+          <span className="shrink-0">{isEs ? 'Lenguaje:' : 'Language:'}</span>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-zinc-800 dark:text-zinc-200 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-xs"
+            className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-zinc-800 dark:text-zinc-200 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-xs text-xs truncate max-w-[155px] xs:max-w-none"
           >
             <option value="auto">
               {isEs
-                ? `Auto-detectar (${detectedLanguage.toUpperCase()})`
-                : `Auto-detect (${detectedLanguage.toUpperCase()})`}
+                ? `Auto (${detectedLanguage})`
+                : `Auto (${detectedLanguage})`}
             </option>
             <option value="javascript">JavaScript</option>
             <option value="typescript">TypeScript</option>
@@ -511,14 +511,14 @@ export function InputPanel({
           </select>
 
           {language === 'auto' && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
               {isEs ? 'Detectado: ' : 'Detected: '}
               {detectedLanguage}
             </span>
           )}
         </div>
 
-        <div className="flex items-center space-x-2 font-mono text-[11px]">
+        <div className="flex items-center space-x-2 font-mono text-[11px] shrink-0">
           <span className={isOverLimit ? 'text-rose-500 font-bold' : 'text-zinc-400 dark:text-zinc-500'}>
             {currentChars.toLocaleString('en-US')} / {maxChars.toLocaleString('en-US')} chars
           </span>
@@ -666,7 +666,7 @@ export function InputPanel({
               type="button"
               disabled={isRunning}
               onClick={() => onInstantReplay(selectedFixture)}
-              className="min-h-[44px] flex items-center justify-center space-x-2 px-4 py-2 rounded-xl border border-cyan-300/80 dark:border-cyan-500/40 bg-cyan-50 dark:bg-cyan-500/10 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+              className="w-full sm:w-auto min-h-[44px] flex items-center justify-center space-x-2 px-4 py-2 rounded-xl border border-cyan-300/80 dark:border-cyan-500/40 bg-cyan-50 dark:bg-cyan-500/10 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
               title={isEs ? 'Cargar resultado de muestra (ejemplo pre-cargado, no una ejecución en vivo)' : 'Load sample result (pre-loaded example, not a live run)'}
             >
               <Zap className="w-4 h-4 fill-cyan-500 text-cyan-500" />
@@ -679,7 +679,7 @@ export function InputPanel({
             type="button"
             disabled={isRunning || isOverLimit || !diffInput.trim()}
             onClick={handleRunLiveClick}
-            className="min-h-[44px] flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            className="w-full sm:w-auto min-h-[44px] flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 text-xs font-bold transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             <Play className="w-4 h-4 fill-zinc-950" />
             <span>

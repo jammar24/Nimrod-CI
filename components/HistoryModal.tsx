@@ -46,10 +46,10 @@ export function HistoryModal({ isOpen, onClose, onSelectReport }: HistoryModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col max-h-[85dvh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col max-h-[88dvh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-zinc-800">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-zinc-800">
           <div className="flex items-center space-x-2.5">
             <History className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base font-semibold text-zinc-100">
@@ -65,12 +65,12 @@ export function HistoryModal({ isOpen, onClose, onSelectReport }: HistoryModalPr
         </div>
 
         {/* Privacy Notice Banner */}
-        <div className="px-5 py-2.5 bg-zinc-950/60 border-b border-zinc-800/80 text-[11px] text-zinc-400 flex items-center justify-between">
-          <span>🔒 Stored exclusively in your browser localStorage. Zero code persisted on server.</span>
+        <div className="px-4 sm:px-5 py-2.5 bg-zinc-950/60 border-b border-zinc-800/80 text-[11px] text-zinc-400 flex items-center justify-between gap-2">
+          <span className="truncate">🔒 Stored exclusively in browser localStorage.</span>
           {items.length > 0 && (
             <button
               onClick={handleClearAll}
-              className="text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 cursor-pointer transition-colors shrink-0"
             >
               <Trash2 className="w-3 h-3" />
               Clear All
@@ -87,11 +87,11 @@ export function HistoryModal({ isOpen, onClose, onSelectReport }: HistoryModalPr
               placeholder="Search by file or verdict..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500/50"
+              className="w-full pl-9 pr-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-base sm:text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500/50"
             />
           </div>
 
-          <div className="flex items-center space-x-1 text-xs">
+          <div className="flex items-center space-x-1 text-xs overflow-x-auto pb-1 sm:pb-0">
             {(['all', 'block', 'review', 'pass'] as const).map((v) => (
               <button
                 key={v}

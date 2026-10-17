@@ -8,9 +8,9 @@ import {
 
 describe('lib/github: URL parsing and language detection', () => {
   it('parses full GitHub PR URL correctly', () => {
-    const res = parseGitHubPrUrl('https://github.com/3m3r4l/nimrod-ci/pull/12');
+    const res = parseGitHubPrUrl('https://github.com/jammar24/nimrod-ci/pull/12');
     expect(res).toEqual({
-      owner: '3m3r4l',
+      owner: 'jammar24',
       repo: 'nimrod-ci',
       pullNumber: 12,
     });
@@ -77,7 +77,7 @@ describe('lib/github: API interactions (mocked)', () => {
       state: 'open',
       base: { ref: 'main' },
       head: { ref: 'patch-1' },
-      html_url: 'https://github.com/3m3r4l/nimrod-ci/pull/1',
+      html_url: 'https://github.com/jammar24/nimrod-ci/pull/1',
     };
 
     const mockDiff = `--- a/routes/users.js\n+++ b/routes/users.js\n@@ -1,3 +1,3 @@\n-const query = "SELECT * FROM users WHERE id=" + id;\n+const query = "SELECT * FROM users WHERE id = $1";\n`;
@@ -89,7 +89,7 @@ describe('lib/github: API interactions (mocked)', () => {
         additions: 1,
         deletions: 1,
         changes: 2,
-        raw_url: 'https://raw.githubusercontent.com/3m3r4l/nimrod-ci/main/routes/users.js',
+        raw_url: 'https://raw.githubusercontent.com/jammar24/nimrod-ci/main/routes/users.js',
       },
     ];
 
@@ -117,12 +117,12 @@ describe('lib/github: API interactions (mocked)', () => {
     });
 
     const result = await fetchGitHubPr({
-      owner: '3m3r4l',
+      owner: 'jammar24',
       repo: 'nimrod-ci',
       pullNumber: 1,
     });
 
-    expect(result.owner).toBe('3m3r4l');
+    expect(result.owner).toBe('jammar24');
     expect(result.title).toBe('Fix SQL injection in authentication');
     expect(result.author).toBe('octocat');
     expect(result.files.length).toBe(1);
@@ -146,7 +146,7 @@ describe('lib/github: API interactions (mocked)', () => {
   it('fails fast when no GitHub token is provided for PR creation', async () => {
     await expect(
       createGitHubPullRequest({
-        owner: '3m3r4l',
+        owner: 'jammar24',
         repo: 'test-repo',
         baseBranch: 'main',
         filePath: 'test.js',
@@ -196,7 +196,7 @@ describe('lib/github: API interactions (mocked)', () => {
           status: 201,
           json: () =>
             Promise.resolve({
-              html_url: 'https://github.com/3m3r4l/nimrod-ci/pull/42',
+              html_url: 'https://github.com/jammar24/nimrod-ci/pull/42',
               number: 42,
               title: '[Nimrod-CI] Security Patch',
             }),
@@ -207,7 +207,7 @@ describe('lib/github: API interactions (mocked)', () => {
     });
 
     const result = await createGitHubPullRequest({
-      owner: '3m3r4l',
+      owner: 'jammar24',
       repo: 'nimrod-ci',
       baseBranch: 'main',
       newBranch: 'nimrod-ci/fix-sqli',
@@ -218,6 +218,6 @@ describe('lib/github: API interactions (mocked)', () => {
 
     expect(result.success).toBe(true);
     expect(result.prNumber).toBe(42);
-    expect(result.prUrl).toBe('https://github.com/3m3r4l/nimrod-ci/pull/42');
+    expect(result.prUrl).toBe('https://github.com/jammar24/nimrod-ci/pull/42');
   });
 });

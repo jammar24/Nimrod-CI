@@ -42,7 +42,7 @@ export function CreatePrModal({
   report,
   targetFinding,
   targetPatch,
-  defaultRepo = '3m3r4l/nimrod-ci',
+  defaultRepo = 'jammar24/Nimrod-CI',
   defaultBaseBranch = 'main',
   defaultFilename = 'routes/users.js',
 }: CreatePrModalProps) {
@@ -115,7 +115,7 @@ export function CreatePrModal({
       ]),
       ``,
       `---`,
-      `*Generated autonomously by [Nimrod-CI](https://github.com/3m3r4l/nimrod-ci) during CI/CD security review.*`,
+      `*Generated autonomously by [Nimrod-CI](https://github.com/jammar24/Nimrod-CI) during CI/CD security review.*`,
     ];
 
     setPrBody(bodyLines.filter(Boolean).join('\n'));
@@ -134,7 +134,7 @@ export function CreatePrModal({
       // Validate repo format
       const repoParts = repoInput.trim().split('/');
       if (repoParts.length !== 2 || !repoParts[0] || !repoParts[1]) {
-        throw new Error('Repository must be in "owner/repo" format (e.g. 3m3r4l/nimrod-ci)');
+        throw new Error('Repository must be in "owner/repo" format (e.g. jammar24/Nimrod-CI)');
       }
 
       const finding = targetFinding || report?.findings?.[0];
@@ -190,10 +190,10 @@ export function CreatePrModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950/70">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-zinc-800 bg-zinc-950/70">
           <div className="flex items-center space-x-2.5">
             <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
               <GitPullRequest className="w-5 h-5" />
@@ -291,8 +291,8 @@ export function CreatePrModal({
                     required
                     value={repoInput}
                     onChange={(e) => setRepoInput(e.target.value)}
-                    placeholder="3m3r4l/nimrod-ci"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
+                    placeholder="jammar24/Nimrod-CI"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs font-mono"
                   />
                 </div>
 
@@ -306,7 +306,7 @@ export function CreatePrModal({
                     value={baseBranch}
                     onChange={(e) => setBaseBranch(e.target.value)}
                     placeholder="main"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs font-mono"
                   />
                 </div>
               </div>
@@ -323,7 +323,7 @@ export function CreatePrModal({
                     value={filePath}
                     onChange={(e) => setFilePath(e.target.value)}
                     placeholder="routes/users.js"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs font-mono"
                   />
                 </div>
 
@@ -337,7 +337,7 @@ export function CreatePrModal({
                     value={newBranch}
                     onChange={(e) => setNewBranch(e.target.value)}
                     placeholder="NIMROD-CI/fix-cwe-89-sqli"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs font-mono"
                   />
                 </div>
               </div>
@@ -353,13 +353,13 @@ export function CreatePrModal({
                   value={prTitle}
                   onChange={(e) => setPrTitle(e.target.value)}
                   placeholder="[NIMROD-CI] Fix SQL Injection"
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs"
                 />
               </div>
 
               {/* GitHub PAT */}
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                   <label className="block text-xs font-medium text-zinc-300">
                     GitHub Personal Access Token (PAT) <span className="text-emerald-400">*</span>
                   </label>
@@ -380,13 +380,13 @@ export function CreatePrModal({
                     value={githubToken}
                     onChange={(e) => setGithubToken(e.target.value)}
                     placeholder="DEMO_SECRET_not_a_real_key_1234 or your PAT..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-xs font-mono"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 text-base sm:text-xs font-mono"
                   />
                   <Key className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
                 </div>
-                <div className="flex items-center justify-between mt-1 text-[11px] text-zinc-500">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-1 text-[11px] text-zinc-500 gap-1">
                   <span>Requires permissions: <code className="text-zinc-400">repo</code> (or fine-grained: contents & PR write)</span>
-                  <span className="text-[11px] text-zinc-400">Kept in memory for this tab only (never persisted or logged)</span>
+                  <span className="text-[11px] text-zinc-400">Kept in memory for this tab only</span>
                 </div>
               </div>
 
@@ -399,23 +399,23 @@ export function CreatePrModal({
                   rows={4}
                   value={prBody}
                   onChange={(e) => setPrBody(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono text-[11px] placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono text-base sm:text-xs placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-800">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:space-x-3 pt-3 border-t border-zinc-800">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors cursor-pointer text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center space-x-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition-all cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition-all cursor-pointer"
                 >
                   {loading ? (
                     <>

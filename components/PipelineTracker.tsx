@@ -42,20 +42,23 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
       aria-live="polite"
       aria-atomic="false"
     >
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800/80">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800/80">
+        <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-300">
             {isEs ? 'Ejecución del Pipeline Agéntico' : 'Agentic Pipeline Execution'}
           </h2>
           {isReplay && (
             <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-              {isEs
-                ? 'Resultado de muestra (ejemplo pre-cargado, no una ejecución en vivo)'
-                : 'Sample result (pre-loaded example, not a live run)'}
+              <span className="sm:hidden">{isEs ? 'Muestra' : 'Sample'}</span>
+              <span className="hidden sm:inline">
+                {isEs
+                  ? 'Resultado de muestra (ejemplo pre-cargado)'
+                  : 'Sample result (pre-loaded example)'}
+              </span>
             </span>
           )}
         </div>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs text-zinc-500 dark:text-zinc-400 shrink-0">
           {isEs ? '5 Pasos Autónomos' : '5 Autonomous Steps'}
         </span>
       </div>
@@ -133,13 +136,13 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
 
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">{displayDesc}</p>
 
-                <div className="flex items-center space-x-2 mt-1.5">
-                  <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950/80 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800/80">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
+                  <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950/80 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800/80 shrink-0">
                     {step.model}
                   </span>
                   {step.details && (
                     <span
-                      className={`text-[11px] truncate ${
+                      className={`text-[11px] break-words ${
                         isError
                           ? 'text-rose-600 dark:text-rose-400 font-medium'
                           : isRunning

@@ -301,7 +301,7 @@ export function formatSarifReport(report: Report): string {
             name: 'Nimrod-CI',
             version: '1.0.0',
             semanticVersion: '1.0.0',
-            informationUri: 'https://github.com/3m3r4l/nimrod-ci',
+            informationUri: 'https://github.com/jammar24/Nimrod-CI',
             rules: report.findings.map((f) => ({
               id: f.cwe || f.id,
               name: f.title.replace(/[^a-zA-Z0-9]/g, ''),

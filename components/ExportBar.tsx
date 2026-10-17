@@ -58,18 +58,18 @@ export function ExportBar({ report, onOpenPrModal, lang = 'es' }: ExportBarProps
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/40 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/40 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors">
       <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-300">
         {isEs ? 'Exportar Informe y Acciones' : 'Report Export & Actions'}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
         {/* GitHub Pull Request CTA */}
         {report.patches && report.patches.length > 0 && onOpenPrModal && (
           <button
             onClick={onOpenPrModal}
             type="button"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-white transition-all text-xs font-semibold focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+            className="col-span-2 sm:col-span-1 flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-white transition-all text-xs font-semibold focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
             title={isEs ? 'Crear Pull Request en GitHub con los parches verificados' : 'Commit verified patches into a new branch and open a Pull Request on GitHub'}
           >
             <GitPullRequest className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -80,58 +80,58 @@ export function ExportBar({ report, onOpenPrModal, lang = 'es' }: ExportBarProps
         <button
           onClick={handleExportMarkdown}
           type="button"
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+          className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
           title="Download report formatted in GitHub-compatible Markdown"
         >
           <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-          <span>Export Markdown</span>
+          <span>Markdown</span>
         </button>
 
         <button
           onClick={handleExportHtml}
           type="button"
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+          className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
           title="Download printable, self-contained HTML report (PDF-ready)"
         >
           <Printer className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-          <span>Export HTML / PDF</span>
+          <span>HTML / PDF</span>
         </button>
 
         <button
           onClick={handleExportJson}
           type="button"
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+          className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
           title="Download raw structured JSON report"
         >
           <Download className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-          <span>Export JSON</span>
+          <span>JSON</span>
         </button>
 
         <button
           onClick={handleExportSarif}
           type="button"
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+          className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
           title="Download OASIS SARIF v2.1.0 standard report for GitHub Code Scanning"
         >
           <Shield className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Export SARIF</span>
+          <span>SARIF</span>
         </button>
 
         {report.patches && report.patches.length > 0 && (
           <button
             onClick={handleCopyAllPatches}
             type="button"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs"
+            className="col-span-2 sm:col-span-1 flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium focus:ring-2 focus:ring-emerald-500/40 cursor-pointer shadow-xs min-h-[38px]"
           >
             {copiedAll ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-600 dark:text-emerald-400">{isEs ? 'Parches Copiados' : 'All Patches Copied'}</span>
+                <span className="text-emerald-600 dark:text-emerald-400">{isEs ? 'Copiados' : 'Copied'}</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-                <span>{isEs ? 'Copiar Todos los Parches' : 'Copy All Patches'}</span>
+                <span>{isEs ? 'Copiar Parches' : 'Copy Patches'}</span>
               </>
             )}
           </button>
