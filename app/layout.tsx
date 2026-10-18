@@ -21,6 +21,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Nimrod-CI — Autonomous Agentic Security Reviewer",
   description: "Autonomous code security reviewer powered by Nebius Token Factory & NVIDIA Nemotron with AST checks and model re-analysis.",
+  icons: {
+    icon: [
+      { url: '/logo-shield.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    shortcut: '/logo-shield.png',
+    apple: '/logo-shield.png',
+  },
 };
 
 export default function RootLayout({

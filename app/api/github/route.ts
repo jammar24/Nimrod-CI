@@ -5,9 +5,18 @@ import {
   createGitHubPullRequest,
   CreatePrPayload,
 } from '@/lib/github';
+import { checkRateLimit } from '@/lib/ratelimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateCheck = await checkRateLimit(req);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: rateCheck.reason || 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const prUrl = searchParams.get('url') || searchParams.get('prUrl');
     const token =
@@ -35,6 +44,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const rateCheck = await checkRateLimit(req);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: rateCheck.reason || 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const { action } = body;
 
