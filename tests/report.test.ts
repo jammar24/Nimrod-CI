@@ -87,6 +87,16 @@ describe('lib/report: Report assembly and formatting', () => {
       ...finding,
       title: '<script>alert("xss")</script> Injection',
       explanation: 'Test <b>bold</b> and <img src=x onerror=alert(1)>',
+      references: [
+        {
+          title: 'Malicious Reference',
+          url: 'javascript:alert(document.cookie)',
+        },
+        {
+          title: 'Legitimate Reference',
+          url: 'https://cwe.mitre.org/data/definitions/89.html',
+        },
+      ],
     };
 
     const report = assembleReport({
@@ -100,5 +110,9 @@ describe('lib/report: Report assembly and formatting', () => {
     expect(html).toContain('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
     expect(html).not.toContain('<script>alert("xss")</script>');
     expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+    // javascript: URL must be neutralized to '#'
+    expect(html).not.toContain('href="javascript:alert(document.cookie)"');
+    expect(html).toContain('href="#"');
+    expect(html).toContain('href="https://cwe.mitre.org/data/definitions/89.html"');
   });
 });

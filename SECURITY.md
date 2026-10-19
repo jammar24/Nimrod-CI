@@ -6,13 +6,9 @@ Nimrod-CI is an autonomous static security review agent designed for Pull Reques
 
 ## 1. Vulnerability Reporting
 
-<<<<<<< HEAD
 If you discover a security vulnerability or bypass within Nimrod-CI, please report it responsibly:
-- **Email:** `emeralsec@gmail.com` (or Jamar Masias  on GitHub: [github.com/jammar24](https://github.com/jammar24))
-=======
-If you discover a security vulnerability or bypass within NIMROD-CI, please report it responsibly:
-- **Email:** `security@jammar.dev` (or Jamar Masias on GitHub: [github.com/jammar24](https://github.com/jammar24))
->>>>>>> 4ff4dcd (feact:visual.new component responsive detail)
+- **Email:** `emeralsec@gmail.com` / `security@jammar.dev`
+- **GitHub Security Advisory / Maintainer:** Jamar Masias ([github.com/jammar24](https://github.com/jammar24))
 - **Response SLA:** Acknowledgment within 24 hours; initial remediation plan within 72 hours.
 - Please do **not** open public GitHub issues for unpatched critical vulnerabilities or zero-days.
 

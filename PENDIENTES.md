@@ -40,11 +40,11 @@
 ### 1.4 Seguridad de la propia aplicación
 > Resumen rápido. El checklist completo está en la **sección 7**.
 
-- [ ] Validar tamaño, extensión y cantidad de archivos subidos (sección 4).
-- [ ] Nunca ejecutar código del usuario fuera de un sandbox aislado.
-- [ ] Verificar que ninguna API key llegue al navegador (revisar bundle y respuestas).
-- [ ] Revisar que el reporte HTML/Markdown escape el contenido del código analizado (evitar XSS en el propio reporte).
-- [ ] Probar el prompt injection con más variantes (comentarios, strings, nombres de variables, docstrings).
+- [x] Validar tamaño, extensión y cantidad de archivos subidos (sección 4).
+- [x] Nunca ejecutar código del usuario fuera de un sandbox aislado.
+- [x] Verificar que ninguna API key llegue al navegador (revisar bundle y respuestas).
+- [x] Revisar que el reporte HTML/Markdown escape el contenido del código analizado (evitar XSS en el propio reporte).
+- [x] Probar el prompt injection con más variantes (comentarios, strings, nombres de variables, docstrings).
 
 ---
 
@@ -168,7 +168,7 @@ NIMROD-CI es una herramienta de seguridad: si ella misma es insegura, pierde tod
 - [x] Historial local: avisar que el código se guarda en el navegador y ofrecer borrado total.
 
 ### 7.7 Dependencias y cadena de suministro
-- [ ] `npm audit` sin vulnerabilidades altas/críticas.
+- [x] `npm audit` sin vulnerabilidades en producción (`0 vulnerabilities` en dependencias de producción, override de `braces: ^3.0.3` para dev).
 - [x] Activar **Dependabot** y fijar versiones con `package-lock.json` (`npm ci` en CI).
 - [x] Añadir `npm audit` (o similar) al workflow de GitHub Actions.
 - [x] Permisos mínimos en el workflow (`permissions: contents: read`) y fijar versiones de las acciones.

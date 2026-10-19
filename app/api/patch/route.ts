@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { callNemotronJson, getModelConfig } from '@/lib/llm';
 import { FindingSchema, PatchSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
+import { sanitizeUntrustedDiff } from '@/lib/prompts';
 
 export const maxDuration = 60;
 
@@ -56,8 +57,12 @@ export async function POST(req: NextRequest) {
     const { finding, originalCode, language, feedback } = parsed.data;
     const { primary: modelPrimary } = getModelConfig();
 
-    const feedbackSection = feedback
-      ? `\n⚠️ PREVIOUS ATTEMPT FAILED VERIFICATION:\n${feedback}\nPlease correct this mistake in your new patch.\n`
+    const safeFeedback = feedback ? sanitizeUntrustedDiff(feedback) : '';
+    const safeSnippet = sanitizeUntrustedDiff(finding.vulnerableSnippet);
+    const safeOriginalCode = sanitizeUntrustedDiff(originalCode);
+
+    const feedbackSection = safeFeedback
+      ? `\n⚠️ PREVIOUS ATTEMPT FAILED VERIFICATION:\n${safeFeedback}\nPlease correct this mistake in your new patch.\n`
       : '';
 
     const userPrompt = `Target Language: ${language}
@@ -65,11 +70,11 @@ Finding to remediate:
 - ID: ${finding.id}
 - Title: ${finding.title}
 - CWE: ${finding.cwe || 'Unknown'}
-- Vulnerable Snippet: ${finding.vulnerableSnippet}
+- Vulnerable Snippet: ${safeSnippet}
 - Explanation: ${finding.explanation}
 ${feedbackSection}
 <<<ORIGINAL_SOURCE_CODE_START>>>
-${originalCode}
+${safeOriginalCode}
 <<<ORIGINAL_SOURCE_CODE_END>>>
 
 Write the minimal security patch. Return strictly valid JSON matching the Patch schema with findingId="${finding.id}".`;

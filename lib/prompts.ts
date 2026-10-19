@@ -77,7 +77,9 @@ export function sanitizeUntrustedDiff(diff: string): string {
     .replace(/<<<UNTRUSTED_CODE_DIFF_END>>>/gi, '[SANITIZED_DELIMITER]')
     .replace(/<<<UNTRUSTED_CODE_DIFF_START>>>/gi, '[SANITIZED_DELIMITER]')
     .replace(/<<<PATCHED_CODE_END>>>/gi, '[SANITIZED_DELIMITER]')
-    .replace(/<<<PATCHED_CODE_START>>>/gi, '[SANITIZED_DELIMITER]');
+    .replace(/<<<PATCHED_CODE_START>>>/gi, '[SANITIZED_DELIMITER]')
+    .replace(/<<<ORIGINAL_SOURCE_CODE_END>>>/gi, '[SANITIZED_DELIMITER]')
+    .replace(/<<<ORIGINAL_SOURCE_CODE_START>>>/gi, '[SANITIZED_DELIMITER]');
 }
 
 export function formatTriageUserPrompt(diff: string, language?: string): string {

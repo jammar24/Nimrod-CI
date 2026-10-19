@@ -14,6 +14,18 @@ const securityHeaders = [
     value: 'strict-origin-when-cross-origin',
   },
   {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  },
+  {
+    key: 'X-DNS-Prefetch-Control',
+    value: 'on',
+  },
+  {
+    key: 'Cross-Origin-Opener-Policy',
+    value: 'same-origin',
+  },
+  {
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
   },
@@ -25,13 +37,14 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.tokenfactory.nebius.com https://api.tavily.com",
+      "connect-src 'self' https://api.tokenfactory.nebius.com https://api.tavily.com https://api.github.com",
       "frame-ancestors 'none'",
     ].join('; '),
   },
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   allowedDevOrigins: ['10.2.0.2'],
   async headers() {
     return [

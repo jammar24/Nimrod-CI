@@ -22,6 +22,23 @@ export function escapeHtml(unsafe: string): string {
 }
 
 /**
+ * Sanitizes URLs to ensure only http/https protocols are allowed, preventing javascript: or data: XSS vectors.
+ */
+export function safeUrl(url: string): string {
+  if (!url) return '#';
+  try {
+    const trimmed = url.trim();
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return trimmed;
+    }
+    return '#';
+  } catch {
+    return '#';
+  }
+}
+
+/**
  * Assembles a complete NIMROD-CI Report object from pipeline artifacts.
  */
 export function assembleReport(options: AssembleReportOptions): Report {
@@ -83,7 +100,7 @@ export function formatMarkdownReport(report: Report): string {
     if (finding.references && finding.references.length > 0) {
       md += `**Tavily Search References:**\n`;
       for (const ref of finding.references) {
-        md += `- [${ref.title}](${ref.url})${ref.snippet ? ` — *${ref.snippet.trim()}*` : ''}\n`;
+        md += `- [${ref.title}](${safeUrl(ref.url)})${ref.snippet ? ` — *${ref.snippet.trim()}*` : ''}\n`;
       }
       md += `\n`;
     }
@@ -137,7 +154,7 @@ export function formatHtmlReport(report: Report): string {
                  ${finding.references
                    .map(
                      (r) =>
-                       `<li><a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+                       `<li><a href="${escapeHtml(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(
                          r.title
                        )}</a> ${r.snippet ? `<span>— ${escapeHtml(r.snippet)}</span>` : ''}</li>`
                    )
