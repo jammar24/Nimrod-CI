@@ -332,9 +332,8 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for full details.
 <p align="center">
   <img src="public/avatar.jpg" alt="Jamar Masias" width="120" style="border-radius: 50%;" /><br />
 
-  <strong>Jamar Masias</strong> (<a href="https://github.com/jammar24">@jammar24</a>)<br />
+  <strong align="center">Jamar Masias</strong> (<a href="https://github.com/jammar24">@jammar24</a>)<br />
   <em>Creator & Security Architect of Nimrod-CI</em><br />
-  <a href="https://github.com/jammar24/Nimrod-CI">github.com/jammar24/Nimrod-CI</a>
 </p>
 
 Designed and directed for the Nebius x NVIDIA Global AI Hackathon; implemented with AI assistance.
