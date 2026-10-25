@@ -65,6 +65,7 @@ export const VerificationSchema = z.object({
   notes: z.string(),
   syntaxEngine: z.string().optional(),
   verificationMethod: z.enum(['compiler_plus_model', 'model_only', 'compiler_only']).optional(),
+  consistencyOk: z.boolean().optional(),
 });
 export type Verification = z.infer<typeof VerificationSchema>;
 

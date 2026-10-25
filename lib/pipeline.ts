@@ -2,6 +2,7 @@ import { Finding, Patch, Verification, Report } from './schemas';
 import { assembleReport } from './report';
 import { SecurityFixture } from './examples';
 import { detectLanguage } from './detect';
+import { resolveOriginalCode } from './diffutil';
 
 export type StepId = 'triage' | 'analyze' | 'enrich' | 'patch' | 'verify';
 export type StepStatus = 'idle' | 'running' | 'completed' | 'error';
@@ -21,14 +22,14 @@ export const INITIAL_PIPELINE_STEPS: StepProgress[] = [
     id: 'triage',
     title: '1. Fast Triage',
     description: 'Scanning diff to isolate high-risk hunks and logic modifications',
-    model: 'NEBIUS_MODEL_FAST',
+    model: 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B',
     status: 'idle',
   },
   {
     id: 'analyze',
     title: '2. Deep SAST Analysis',
     description: 'Reasoning over modified lines to classify CWE, OWASP and exploit paths',
-    model: 'NEBIUS_MODEL_PRIMARY',
+    model: 'nvidia/nemotron-3-super-120b-a12b',
     status: 'idle',
   },
   {
@@ -42,14 +43,14 @@ export const INITIAL_PIPELINE_STEPS: StepProgress[] = [
     id: 'patch',
     title: '4. Autonomous Patching',
     description: 'Synthesizing minimal, non-breaking security patches in unified diff',
-    model: 'NEBIUS_MODEL_PRIMARY',
+    model: 'nvidia/nemotron-3-super-120b-a12b',
     status: 'idle',
   },
   {
     id: 'verify',
     title: '5. AST & Model Verification',
     description: 'Verification: apply the patch, run a syntax check, re-analyze patched code with model, retry up to 2 times',
-    model: 'Compiler AST + NEBIUS_MODEL_FAST',
+    model: 'Compiler AST + nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B',
     status: 'idle',
   },
 ];
@@ -201,11 +202,13 @@ export async function runLivePipeline(
     updateStep('patch', { status: 'running', details: `Synthesizing patches for ${findings.length} finding(s)...` });
     updateStep('verify', { status: 'running', details: 'Awaiting patch application and verification...' });
 
-    const patchStart = Date.now();
+    let patchDurationMs = 0;
+    let verifyDurationMs = 0;
     const patches: Patch[] = [];
     const verifications: Verification[] = [];
 
-    const effectiveCode = originalCode.trim() ? originalCode : diff;
+    // Ensure original code is reconstructed from the submitted diff and does not reuse stale example code
+    const effectiveCode = resolveOriginalCode(diff, originalCode);
 
     for (const finding of findings) {
       let currentPatch: Patch | null = null;
@@ -218,6 +221,7 @@ export async function runLivePipeline(
           details: `Synthesizing patch for "${finding.title}" (iteration ${iteration})...`,
         });
 
+        const patchT0 = Date.now();
         const patchRes = await fetch('/api/patch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -229,6 +233,8 @@ export async function runLivePipeline(
           }),
           signal,
         });
+
+        patchDurationMs += Date.now() - patchT0;
 
         if (!patchRes.ok) {
           const err = await patchRes.json().catch(() => ({}));
@@ -243,6 +249,7 @@ export async function runLivePipeline(
           details: `Verifying patch with AST compiler & model re-analysis (iteration ${iteration})...`,
         });
 
+        const verifyT0 = Date.now();
         const verifyRes = await fetch('/api/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -255,6 +262,8 @@ export async function runLivePipeline(
           }),
           signal,
         });
+
+        verifyDurationMs += Date.now() - verifyT0;
 
         if (!verifyRes.ok) {
           const err = await verifyRes.json().catch(() => ({}));
@@ -280,13 +289,13 @@ export async function runLivePipeline(
     updateStep('patch', {
       status: 'completed',
       details: `Generated ${patches.length} patch(es)`,
-      durationMs: Date.now() - patchStart,
+      durationMs: patchDurationMs,
     });
 
     updateStep('verify', {
       status: 'completed',
       details: `${verifiedCount}/${findings.length} patch(es) verified successfully`,
-      durationMs: Date.now() - patchStart,
+      durationMs: verifyDurationMs,
     });
 
     const totalDuration = Date.now() - startTime;
@@ -302,13 +311,16 @@ export async function runLivePipeline(
       durationMs: totalDuration,
       isReplay: false,
     };
-  } catch (error: any) {
+  } catch (error) {
     // Mark any running step as error
     const running = steps.find((s) => s.status === 'running');
     if (running) {
       updateStep(running.id, {
         status: 'error',
-        details: error.message || 'Execution error',
+        details:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Execution error',
       });
     }
     throw error;

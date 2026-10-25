@@ -58,7 +58,7 @@ describe('/api/github Route Handler', () => {
       expect(body.error).toContain('Invalid GitHub Pull Request URL');
     });
 
-    it('returns 400 when create-pr is missing required fields', async () => {
+    it('returns 400 when create-pr fails validation', async () => {
       const req = new NextRequest('http://localhost:3000/api/github', {
         method: 'POST',
         body: JSON.stringify({ action: 'create-pr', owner: 'test' }),
@@ -67,7 +67,26 @@ describe('/api/github Route Handler', () => {
       const res = await POST(req);
       expect(res.status).toBe(400);
       const body = await res.json();
-      expect(body.error).toContain('Missing required fields');
+      expect(body.error).toContain('Invalid create-pr payload');
+    });
+
+    it('returns 400 when create-pr owner contains illegal URL-path characters', async () => {
+      const req = new NextRequest('http://localhost:3000/api/github', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'create-pr',
+          owner: 'evil/..%2F..%2F',
+          repo: 'repo',
+          filePath: 'src/app.js',
+          patchedContent: 'safe code',
+          token: 'ghp_testtoken',
+        }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain('Invalid create-pr payload');
     });
   });
 });

@@ -41,11 +41,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       findings: enriched,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Enrich endpoint error:', error);
     return NextResponse.json(
       {
-        error: error.message || 'Internal server error during search enrichment',
+        error:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Internal server error during search enrichment',
       },
       { status: 500 }
     );

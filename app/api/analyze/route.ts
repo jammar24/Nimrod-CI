@@ -55,10 +55,10 @@ export async function POST(req: NextRequest) {
       userPrompt,
       schema: AnalyzeResultSchema,
       temperature: 0.1,
-      maxTokens: 3000,
+      maxTokens: 4000,
     });
 
-    const responsePayload: Record<string, any> = {
+    const responsePayload: Record<string, unknown> = {
       findings: result.data.findings,
       telemetry: {
         modelUsed: result.modelUsed,
@@ -78,11 +78,14 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(responsePayload);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Analyze endpoint error:', error);
     return NextResponse.json(
       {
-        error: error.message || 'Internal server error during analysis execution',
+        error:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Internal server error during analysis execution',
       },
       { status: 500 }
     );

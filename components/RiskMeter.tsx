@@ -35,52 +35,72 @@ export function RiskMeter({
   const [displayedNumber, setDisplayedNumber] = useState(0);
 
   useEffect(() => {
-    // Reset to 0 when score changes, then trigger smooth fluid load
-    setAnimatedWidth(0);
-    setDisplayedNumber(0);
+    // Defer the reset + animation start to the next frame to avoid
+    // cascading synchronous renders within the effect body.
+    let cancelled = false;
 
-    const animationDuration = 950; // ms
-    let startTime: number | null = null;
-    let animId: number;
+    const start = () => {
+      if (cancelled) return;
+      // Reset to 0 when score changes, then trigger smooth fluid load
+      setAnimatedWidth(0);
+      setDisplayedNumber(0);
 
-    const timer = setTimeout(() => {
-      setAnimatedWidth(boundedScore);
-    }, 60);
+      const animationDuration = 950; // ms
+      let startTime: number | null = null;
+      let animId: number;
 
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / animationDuration, 1);
-      // Ease out cubic: 1 - (1 - progress)^3
-      const ease = 1 - Math.pow(1 - progress, 3);
-      setDisplayedNumber(Math.round(ease * boundedScore));
+      const timer = setTimeout(() => {
+        setAnimatedWidth(boundedScore);
+      }, 60);
 
-      if (progress < 1) {
-        animId = requestAnimationFrame(step);
-      } else {
-        setDisplayedNumber(boundedScore);
-      }
+      const step = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / animationDuration, 1);
+        // Ease out cubic: 1 - (1 - progress)^3
+        const ease = 1 - Math.pow(1 - progress, 3);
+        setDisplayedNumber(Math.round(ease * boundedScore));
+
+        if (progress < 1) {
+          animId = requestAnimationFrame(step);
+        } else {
+          setDisplayedNumber(boundedScore);
+        }
+      };
+
+      animId = requestAnimationFrame(step);
+
+      return () => {
+        clearTimeout(timer);
+        cancelAnimationFrame(animId);
+      };
     };
 
-    animId = requestAnimationFrame(step);
+    let innerCleanup: (() => void) | undefined;
+    const initialRaf = requestAnimationFrame(() => {
+      if (!cancelled) {
+        innerCleanup = start();
+      }
+    });
 
     return () => {
-      clearTimeout(timer);
-      cancelAnimationFrame(animId);
+      cancelled = true;
+      cancelAnimationFrame(initialRaf);
+      innerCleanup?.();
     };
   }, [boundedScore]);
 
   let barColor = 'bg-emerald-500';
   let textColor = 'text-emerald-400';
-  let badgeText = isEs ? 'Seguro / Bajo Riesgo' : 'Safe / Low Risk';
+  let badgeText = isEs ? 'Riesgo Bajo' : 'Low Risk';
 
   if (isMitigated && totalFindings > 0) {
     // When vulnerabilities were detected and verified-patched
     barColor = 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 shadow-sm shadow-emerald-500/20';
     textColor = 'text-emerald-400';
     badgeText = isEs
-      ? `${displayedNumber}/100 · Riesgo Mitigado (Parche Verificado)`
-      : `${displayedNumber}/100 · Risk Mitigated (Verified Patch)`;
+      ? `${displayedNumber}/100 · Parche Verificado`
+      : `${displayedNumber}/100 · Patch Verified`;
   } else if (boundedScore > 50) {
     barColor = 'bg-gradient-to-r from-rose-600 to-rose-500 shadow-sm shadow-rose-500/30';
     textColor = 'text-rose-400';
@@ -97,8 +117,8 @@ export function RiskMeter({
     barColor = 'bg-emerald-500';
     textColor = 'text-emerald-400';
     badgeText = isEs
-      ? `${displayedNumber}/100 · Seguro / Zero Riesgo`
-      : `${displayedNumber}/100 · Safe / Zero Risk`;
+      ? `${displayedNumber}/100 · Sin vulnerabilidades detectadas`
+      : `${displayedNumber}/100 · No vulnerabilities detected`;
   }
 
   // Minimum visual width so the bar is visible and fluidly fills
@@ -139,8 +159,8 @@ export function RiskMeter({
           <span>🛡️</span>
           <span>
             {isEs
-              ? `Riesgo detectado en código: ${boundedScore}/100 ➔ Riesgo residual: 0/100 (Seguro con parche verificado)`
-              : `Code vulnerability risk: ${boundedScore}/100 ➔ Residual risk: 0/100 (Safe with verified patch)`}
+              ? `Riesgo detectado: ${boundedScore}/100 ➔ Parche verificado por compilador y re-análisis`
+              : `Detected risk: ${boundedScore}/100 ➔ Patch verified by compiler and re-analysis`}
           </span>
         </div>
       )}

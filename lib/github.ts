@@ -199,13 +199,23 @@ export async function fetchGitHubPr(
     }
   );
 
-  const rawFiles: any[] = filesRes.ok ? await filesRes.json() : [];
-  const files: GitHubPrFile[] = rawFiles.map((f: any) => ({
-    filename: f.filename,
-    status: f.status,
-    additions: f.additions,
-    deletions: f.deletions,
-    changes: f.changes,
+  interface GitHubApiFile {
+    filename?: string;
+    status?: string;
+    additions?: number;
+    deletions?: number;
+    changes?: number;
+    patch?: string;
+    raw_url?: string;
+  }
+
+  const rawFiles: GitHubApiFile[] = filesRes.ok ? await filesRes.json() : [];
+  const files: GitHubPrFile[] = rawFiles.map((f) => ({
+    filename: f.filename ?? '',
+    status: f.status ?? '',
+    additions: f.additions ?? 0,
+    deletions: f.deletions ?? 0,
+    changes: f.changes ?? 0,
     patch: f.patch,
     rawUrl: f.raw_url,
   }));
@@ -257,6 +267,29 @@ export async function fetchGitHubPr(
 }
 
 /**
+ * Validates that a user-supplied owner/repo name only contains characters
+ * that are safe for GitHub API path interpolation.
+ */
+function assertSafeRepoComponent(value: string, field: string): string {
+  if (!/^[a-zA-Z0-9_.-]+$/.test(value)) {
+    throw new Error(`Invalid ${field}: contains characters not allowed in a GitHub repository name.`);
+  }
+  return value;
+}
+
+/**
+ * Encodes each segment of a path/branch for safe interpolation into a
+ * GitHub API URL (keeps literal '/'; encodes '?', '#', '..', '%', etc.).
+ */
+function encodeApiPathSegments(value: string): string {
+  return value
+    .split('/')
+    .filter((seg) => seg.length > 0)
+    .map((seg) => encodeURIComponent(seg))
+    .join('/');
+}
+
+/**
  * Autonomously create a Pull Request on GitHub with the verified security patch
  */
 export async function createGitHubPullRequest(
@@ -287,19 +320,29 @@ export async function createGitHubPullRequest(
     'Content-Type': 'application/json',
   };
 
-  const cleanOwner = owner.trim();
-  const cleanRepo = repo.trim().replace(/\.git$/i, '');
-  const cleanFilePath = filePath.trim().replace(/^\/+/, '');
+  const cleanOwner = assertSafeRepoComponent(owner.trim(), 'owner');
+  const cleanRepo = assertSafeRepoComponent(repo.trim().replace(/\.git$/i, ''), 'repo');
+  const cleanFilePath = encodeApiPathSegments(filePath.trim().replace(/^\/+/, ''));
+  const encodedBaseBranch = encodeApiPathSegments(baseBranch.trim());
+  if (!cleanFilePath) {
+    throw new Error('filePath is required to commit the patched code.');
+  }
+  if (typeof payload.patchedContent !== 'string' || payload.patchedContent.length === 0) {
+    throw new Error('patchedContent is required to commit the patched code.');
+  }
 
   // 1. Get base branch commit SHA
   const baseRefRes = await fetch(
-    `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/git/ref/heads/${baseBranch.trim()}`,
+    `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/git/ref/heads/${encodedBaseBranch}`,
     { headers }
   );
 
   if (!baseRefRes.ok) {
     if (baseRefRes.status === 404) {
       throw new Error(`Base branch '${baseBranch}' was not found in ${cleanOwner}/${cleanRepo}.`);
+    }
+    if (baseRefRes.status === 403 || baseRefRes.status === 429) {
+      throw new Error('GitHub API rate limit exceeded while resolving the base branch. Provide a PAT with higher limits.');
     }
     const errText = await baseRefRes.text();
     throw new Error(`Failed to resolve base branch '${baseBranch}': ${errText}`);
@@ -355,7 +398,7 @@ export async function createGitHubPullRequest(
   // 3. Check if file already exists on this new branch to obtain its SHA (required by GitHub contents API for updates)
   let existingSha: string | undefined = undefined;
   const getFileRes = await fetch(
-    `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/contents/${cleanFilePath}?ref=${targetBranch}`,
+    `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/contents/${cleanFilePath}?ref=${encodeURIComponent(targetBranch)}`,
     { headers }
   );
 

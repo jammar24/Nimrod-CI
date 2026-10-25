@@ -25,6 +25,7 @@ export function VerifiedBadge({ verification }: VerifiedBadgeProps) {
       : 'AST Compiler';
 
   const isModelOnly = verification.verificationMethod === 'model_only' || engine === 'none';
+  const attemptsText = `Attempts: ${verification.iterations || 1} of 2`;
 
   if (isVerified) {
     return (
@@ -32,8 +33,8 @@ export function VerifiedBadge({ verification }: VerifiedBadgeProps) {
         <div className="flex items-center space-x-2 font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>✓ Patch Verified</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
-            {verification.iterations} iter{verification.iterations > 1 ? 's' : ''}
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+            {attemptsText}
           </span>
         </div>
 
@@ -49,10 +50,10 @@ export function VerifiedBadge({ verification }: VerifiedBadgeProps) {
           ) : (
             <span
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800/80 border border-amber-500/30 text-amber-300 font-mono"
-              title="Syntax for Python was verified via model reasoning"
+              title="Syntax check not available for Python; model re-analysis only"
             >
               <Cpu className="w-3 h-3 text-amber-400" />
-              Syntax: Model-only check
+              Syntax check not available for Python; model re-analysis only
             </span>
           )}
 
@@ -68,16 +69,32 @@ export function VerifiedBadge({ verification }: VerifiedBadgeProps) {
     );
   }
 
+  const isConsistencyFail =
+    verification.consistencyOk === false ||
+    verification.notes?.toLowerCase().includes('consistency');
+
+  const finalFailureReason =
+    verification.notes ||
+    (isConsistencyFail
+      ? 'Patch consistency check failed'
+      : !verification.syntaxOk
+      ? `AST Syntax Error (${engineName})`
+      : 'Security Vulnerability Persists in Patch');
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs">
-      <div className="flex items-center space-x-2 font-semibold">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-        <span>⚠️ Verification Failed or Incomplete</span>
+    <div className="flex flex-col gap-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 font-semibold">
+        <div className="flex items-center space-x-2">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>⚠️ Verification Failed</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono">
+            {attemptsText}
+          </span>
+        </div>
       </div>
-      <div className="text-[11px] text-amber-300/90 font-mono sm:ml-auto">
-        {!verification.syntaxOk
-          ? `AST Syntax Error (${engineName})`
-          : 'Security Vulnerability Persists in Patch'}
+      <div className="text-[11px] text-rose-300/90 font-mono bg-rose-950/40 p-2 rounded-lg border border-rose-500/20">
+        <span className="font-semibold text-rose-200">Failure reason: </span>
+        {finalFailureReason}
       </div>
     </div>
   );

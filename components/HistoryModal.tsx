@@ -18,7 +18,9 @@ export function HistoryModal({ isOpen, onClose, onSelectReport }: HistoryModalPr
 
   useEffect(() => {
     if (isOpen) {
-      setItems(getHistory());
+      // Defer state update to avoid a cascading synchronous render in the effect
+      const raf = requestAnimationFrame(() => setItems(getHistory()));
+      return () => cancelAnimationFrame(raf);
     }
   }, [isOpen]);
 

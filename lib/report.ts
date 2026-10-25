@@ -362,9 +362,16 @@ export function formatSarifReport(report: Report): string {
         },
         results: report.findings.map((f) => {
           const patch = report.patches.find((p) => p.findingId === f.id);
-          const verification = report.verifications.find((v) => v.findingId === f.id);
 
-          const result: any = {
+          interface SarifResult {
+            ruleId: string;
+            message: { text: string };
+            level: 'error' | 'warning' | 'note';
+            locations: unknown[];
+            fixes?: unknown[];
+          }
+
+          const result: SarifResult = {
             ruleId: f.cwe || f.id,
             message: {
               text: `${f.title}: ${f.explanation}`,

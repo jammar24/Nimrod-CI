@@ -225,14 +225,14 @@ export default function DocsPage() {
     {
       method: 'POST',
       path: '/api/patch',
-      title: 'Autonomous Patch Synthesis',
+      title: 'Autonomous Patch Synthesis (Hard Safety Rules)',
       engine: models.primary,
-      description: 'Generates a minimal, non-breaking unified diff and patched source code file that completely eliminates the reported vulnerability.',
+      description: 'Generates a minimal, non-breaking unified diff and patched source code file. Governed by strict safety rules: never proposes eval, new Function, exec/execSync with interpolated input, or shell=True. Enforces the real target file path in the unified diff header (e.g. --- a/path and +++ b/path).',
       params: [
         { name: 'finding', type: 'object', required: true, description: 'Finding object to remediate' },
         { name: 'originalCode', type: 'string', required: true, description: 'Full or hunk source code' },
         { name: 'language', type: 'string', required: false, description: 'Source language (javascript, typescript, python)' },
-        { name: 'feedback', type: 'string', required: false, description: 'Compiler or verification feedback for iterative self-repair' },
+        { name: 'feedback', type: 'string', required: false, description: 'Verification feedback with CWE and line number for iterative self-repair' },
       ],
       requestSnippet: `{
   "finding": {
@@ -261,13 +261,13 @@ export default function DocsPage() {
       path: '/api/verify',
       title: 'AST Syntax Verification & Model Re-Analysis',
       engine: `Acorn/TS Compiler + ${models.fast}`,
-      description: 'Verifies the synthesized patch through a two-stage gate: (1) In-memory diff application and AST compiler syntax check, followed by (2) Model re-analysis to guarantee vulnerability eradication.',
+      description: 'Verifies the synthesized patch through a two-stage gate: (1) In-memory diff application and AST compiler syntax check, followed by (2) Model re-analysis explicitly checking: "Does the patched code still contain the original weakness OR any new security weakness introduced by the patch? List any (CWE and line)." If any weakness is detected, returns resolved: false with the CWE and line in notes, feeding back to /api/patch for an automated retry (up to 2 iterations).',
       params: [
         { name: 'finding', type: 'object', required: true, description: 'Original Finding' },
         { name: 'patch', type: 'object', required: true, description: 'Synthesized Patch object' },
         { name: 'originalCode', type: 'string', required: true, description: 'Original source code' },
         { name: 'language', type: 'string', required: false, description: 'Target language' },
-        { name: 'iteration', type: 'number', required: false, description: 'Current loop iteration (1 to 2)' },
+        { name: 'iteration', type: 'number', required: false, description: 'Current loop iteration (1 to 2, server-enforced max)' },
       ],
       requestSnippet: `{
   "finding": { "id": "fnd_001", "title": "SQLi", "cwe": "CWE-89", "severity": "critical" },
@@ -745,10 +745,10 @@ export default function DocsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    Generates a minimal, production-ready unified diff patch adhering strictly to existing coding styles. Uses parameterized queries, safe serializers, and proper encoding to eradicate the vulnerability without introducing regressions.
+                    Generates a minimal, production-ready unified diff patch adhering strictly to existing coding styles. Enforces hard safety rules: never proposes dynamic code evaluation (eval, new Function, shell=True). If no safe remediation exists, dynamic evaluation is stripped. Preserves the exact target file path in the diff header.
                   </p>
                   <div className="text-xs font-mono text-blue-400 pt-1">
-                    Format: Standard unified diff (--- / +++) + full patched file
+                    Format: Standard unified diff (--- a/file / +++ b/file) + full patched file
                   </div>
                 </div>
               </div>
@@ -765,10 +765,10 @@ export default function DocsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    Applies the synthesized patch in memory and executes AST syntax parsing (JavaScript/TypeScript). Once syntax is validated, a secondary Nemotron check re-analyzes the patched code to ensure the vulnerability has been completely resolved. Retries up to 2 times with compiler feedback if needed.
+                    Applies the synthesized patch in memory and executes AST syntax parsing (JavaScript/TypeScript). Once syntax is validated, a differential security re-analysis evaluates whether the original flaw or any new weakness was introduced (listing CWE and line). Retries up to 2 times with feedback. Unverified patches display a red warning banner and disable automated PR submission.
                   </p>
                   <div className="text-xs font-mono text-amber-400 pt-1">
-                    Guarantee: Non-breaking syntax + verified vulnerability resolution
+                    Guarantee: Non-breaking syntax + verified vulnerability resolution + PR safety gate
                   </div>
                 </div>
               </div>

@@ -7,14 +7,27 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
+    // Read persisted theme after mount; defer state update to avoid a
+    // cascading synchronous render inside the effect body.
+    let nextTheme: 'dark' | 'light' = 'dark';
     const savedTheme = localStorage.getItem('nimrod_theme') as 'dark' | 'light' | null;
-    const initialTheme = savedTheme || 'dark';
-    setTheme(initialTheme);
-    if (initialTheme === 'dark') {
+    if (savedTheme) nextTheme = savedTheme;
+
+    let cancel = false;
+    const raf = requestAnimationFrame(() => {
+      if (!cancel) {
+        setTheme(nextTheme);
+      }
+    });
+    if (nextTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+    return () => {
+      cancel = true;
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const toggleTheme = () => {

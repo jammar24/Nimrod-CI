@@ -42,7 +42,7 @@ export function VerdictCard({
       iconColor: 'text-amber-600 dark:text-amber-400',
     },
     pass: {
-      title: isEs ? 'APROBADO Y SEGURO' : 'PASS & SAFE',
+      title: isEs ? 'APROBADO' : 'PASS',
       badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
       borderClass: 'border-emerald-500/40',
       bgGlow: 'from-emerald-500/10 to-transparent',

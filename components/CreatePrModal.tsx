@@ -68,24 +68,30 @@ export function CreatePrModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    // Pick active finding & patch
-    const finding = targetFinding || report?.findings?.[0];
-    const patch =
-      targetPatch ||
-      (finding ? report?.patches?.find((p) => p.findingId === finding.id) : report?.patches?.[0]);
+    // Defer state updates to the next frame to avoid cascading
+    // synchronous renders within the effect body.
+    let cancelled = false;
+    const raf = requestAnimationFrame(() => {
+      if (cancelled) return;
 
-    const cweSlug = finding?.cwe ? finding.cwe.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'sec';
-    const randomSuffix = Math.random().toString(36).substring(2, 7);
-    const branchName = `nimrod-ci/fix-${cweSlug}-${randomSuffix}`;
-    setNewBranch(branchName);
+      // Pick active finding & patch
+      const finding = targetFinding || report?.findings?.[0];
+      const patch =
+        targetPatch ||
+        (finding ? report?.patches?.find((p) => p.findingId === finding.id) : report?.patches?.[0]);
 
-    const filename = defaultFilename || 'routes/users.js';
-    setFilePath(filename);
+      const cweSlug = finding?.cwe ? finding.cwe.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'sec';
+      const randomSuffix = Math.random().toString(36).substring(2, 7);
+      const branchName = `nimrod-ci/fix-${cweSlug}-${randomSuffix}`;
+      setNewBranch(branchName);
 
-    const title = finding
-      ? `[Nimrod-CI] Fix: ${finding.title} (${finding.cwe})`
-      : `[Nimrod-CI] Autonomous Security Patch`;
-    setPrTitle(title);
+      const filename = defaultFilename || 'routes/users.js';
+      setFilePath(filename);
+
+      const title = finding
+        ? `[Nimrod-CI] Fix: ${finding.title} (${finding.cwe})`
+        : `[Nimrod-CI] Autonomous Security Patch`;
+      setPrTitle(title);
 
     // Build rich PR body
     const bodyLines: string[] = [
@@ -118,9 +124,15 @@ export function CreatePrModal({
       `*Generated autonomously by [Nimrod-CI](https://github.com/jammar24/Nimrod-CI) during CI/CD security review.*`,
     ];
 
-    setPrBody(bodyLines.filter(Boolean).join('\n'));
-    setCreatedPr(null);
-    setErrorMessage(null);
+      setPrBody(bodyLines.filter(Boolean).join('\n'));
+      setCreatedPr(null);
+      setErrorMessage(null);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, [isOpen, targetFinding, targetPatch, report, defaultRepo, defaultBaseBranch, defaultFilename]);
 
   if (!isOpen) return null;
@@ -175,8 +187,11 @@ export function CreatePrModal({
       }
 
       setCreatedPr(data.data);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'An unexpected error occurred while communicating with GitHub');
+    } catch (err) {
+      setErrorMessage(
+        (err instanceof Error && err.message) ||
+          'An unexpected error occurred while communicating with GitHub'
+      );
     } finally {
       setLoading(false);
     }

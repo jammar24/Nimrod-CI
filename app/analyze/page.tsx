@@ -48,9 +48,9 @@ export default function AnalyzePage() {
     fetch('/api/health')
       .then((res) => res.json())
       .then((data) => {
-        if (data?.models) {
-          const fast = data.models.fast || 'not configured';
-          const primary = data.models.primary || 'not configured';
+        const fast = data?.models?.fast || data?.integrations?.nebiusTokenFactory?.fastModel;
+        const primary = data?.models?.primary || data?.integrations?.nebiusTokenFactory?.primaryModel;
+        if (fast && primary) {
           setPipelineSteps((prev) =>
             prev.map((step) => {
               if (step.id === 'triage') return { ...step, model: fast };
@@ -186,8 +186,11 @@ export default function AnalyzePage() {
     setIsCreatePrModalOpen(true);
   };
 
-  // Derive patched code from report for InputPanel download
+  // Derive patched code and verification status for InputPanel download
   const patchedCode = report?.patches?.[0]?.patchedCode;
+  const isPatchedCodeVerified = report
+    ? report.verifications?.length > 0 && report.verifications.every((v) => v.resolved && v.syntaxOk)
+    : true;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 selection:bg-emerald-500/30 selection:text-white transition-colors font-sans">
@@ -225,6 +228,7 @@ export default function AnalyzePage() {
               onInstantReplay={handleInstantReplay}
               isRunning={isRunning}
               patchedCode={patchedCode}
+              isPatchedCodeVerified={isPatchedCodeVerified}
               currentFilename={currentFilename}
               lang={lang}
               onGitContextChange={(ctx) => setGitRepoContext(ctx)}
@@ -308,8 +312,8 @@ export default function AnalyzePage() {
                       </h4>
                       <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-md mt-1 leading-relaxed">
                         {isEs
-                          ? 'Los cambios analizados no contienen vulnerabilidades explotables, fugas de secretos ni patrones inseguros. Seguro para producción.'
-                          : 'The analyzed code changes contain no exploitable vulnerabilities, secret leaks, or unsafe API patterns. Safe to merge into production.'}
+                          ? 'Los cambios analizados no contienen vulnerabilidades explotables, fugas de secretos ni patrones inseguros.'
+                          : 'The analyzed code changes contain no exploitable vulnerabilities, secret leaks, or unsafe API patterns.'}
                       </p>
                     </div>
                   ) : (

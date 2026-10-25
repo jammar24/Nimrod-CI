@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { applyPatchToCode } from '@/lib/diffutil';
+import { applyPatchToCode, checkPatchConsistency } from '@/lib/diffutil';
 import { checkSyntax } from '@/lib/syntax';
 import { callNemotronJson, getModelConfig } from '@/lib/llm';
-import { FindingSchema, PatchSchema, VerificationSchema, Verification } from '@/lib/schemas';
+import { FindingSchema, PatchSchema, Verification } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
-import { sanitizeUntrustedDiff } from '@/lib/prompts';
+import { sanitizeUntrustedDiff, VERIFY_REANALYSIS_SYSTEM_PROMPT } from '@/lib/prompts';
 import { getValidatedEnv } from '@/lib/env';
 
 export const maxDuration = 45;
@@ -22,20 +22,6 @@ const ReanalysisSchema = z.object({
   resolved: z.boolean(),
   notes: z.string(),
 });
-
-const VERIFY_REANALYSIS_SYSTEM_PROMPT = `You are NIMROD-CI Automated Verification Engine.
-Your task is to re-analyze patched source code to determine if the specific reported security vulnerability has been completely eliminated.
-
-RULES:
-1. Compare the patched code against the reported vulnerability.
-2. If the vulnerability is genuinely fixed (e.g. parameterized queries replacing SQL concatenation, secrets removed, HTML escaped, safe paths asserted), set "resolved": true.
-3. If the vulnerability still exists, or if a new obvious vulnerability was introduced, set "resolved": false and explain why in "notes".
-4. Output ONLY valid JSON matching:
-{
-  "resolved": boolean,
-  "notes": "string explanation of verification decision"
-}
-Do not write markdown fences or conversational text.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -67,6 +53,23 @@ export async function POST(req: NextRequest) {
         { error: `Iteration ${iteration} exceeds server-side limit of ${maxIterations} iterations.` },
         { status: 422 }
       );
+    }
+
+    // STEP 0: Consistency check (language and file path of patch must match analyzed finding)
+    const consistency = checkPatchConsistency(finding, patch, language, originalCode);
+    if (!consistency.valid) {
+      return NextResponse.json({
+        verification: {
+          findingId: finding.id,
+          syntaxOk: false,
+          resolved: false,
+          iterations: iteration,
+          notes: `Patch consistency check failed: ${consistency.reason}`,
+          syntaxEngine: 'none',
+          verificationMethod: 'model_only',
+          consistencyOk: false,
+        },
+      });
     }
 
     // STEP 1: Apply unified diff patch to original code
@@ -112,7 +115,8 @@ export async function POST(req: NextRequest) {
     const safeSnippet = sanitizeUntrustedDiff(finding.vulnerableSnippet);
     const safePatchedCode = sanitizeUntrustedDiff(codeToVerify);
 
-    const userPrompt = `Vulnerability to verify:
+    const userPrompt = `Target File: ${finding.file}
+Vulnerability to verify:
 - Title: ${finding.title}
 - CWE: ${finding.cwe || 'Unknown'}
 - Original Vulnerable Snippet:
@@ -122,7 +126,9 @@ ${safeSnippet}
 ${safePatchedCode}
 <<<PATCHED_CODE_END>>>
 
-Has this security vulnerability been completely resolved? Return ONLY JSON with "resolved" and "notes".`;
+Question: Does the patched code still contain the original weakness OR any new security weakness introduced by the patch? List any (CWE and line).
+If the answer lists any weakness (including eval, new Function, shell=True, command execution, or unresolved flaw), verification fails: set "resolved": false and state the weakness with CWE and line in "notes".
+Return ONLY valid JSON with "resolved" and "notes".`;
 
     const reanalysis = await callNemotronJson({
       model: modelFast,
@@ -130,22 +136,42 @@ Has this security vulnerability been completely resolved? Return ONLY JSON with 
       userPrompt,
       schema: ReanalysisSchema,
       temperature: 0.05,
-      maxTokens: 1000,
+      maxTokens: 2000,
     });
 
-    const isResolved = reanalysis.data.resolved;
-    const notes = reanalysis.data.notes;
+    // Hard rule: if the patched code executes untrusted input via eval/new Function/shell=True, reject immediately
+    let isResolved = reanalysis.data.resolved;
+    let notes = reanalysis.data.notes;
+
+    const containsDangerousDynamicExec =
+      /\beval\s*\(/.test(codeToVerify) ||
+      /\bnew\s+Function\s*\(/.test(codeToVerify) ||
+      /shell\s*=\s*True/.test(codeToVerify);
+
+    if (containsDangerousDynamicExec) {
+      isResolved = false;
+      const violationDetail = /\beval\s*\(/.test(codeToVerify)
+        ? 'Patched code introduces forbidden dynamic evaluation: eval() detected (CWE-95)'
+        : /\bnew\s+Function\s*\(/.test(codeToVerify)
+        ? 'Patched code introduces forbidden dynamic code execution: new Function() detected (CWE-95)'
+        : 'Patched code introduces forbidden command execution: shell=True detected (CWE-78)';
+      notes = notes ? `${violationDetail}. Model note: ${notes}` : violationDetail;
+    }
+
     const verificationMethod: Verification['verificationMethod'] =
       syntaxResult.engineUsed === 'none' ? 'model_only' : 'compiler_plus_model';
+
+    const combinedNotes = syntaxResult.notes ? `${syntaxResult.notes}. ${notes}` : notes;
 
     const verification: Verification = {
       findingId: finding.id,
       syntaxOk: true,
       resolved: isResolved,
       iterations: iteration,
-      notes,
+      notes: combinedNotes,
       syntaxEngine: syntaxResult.engineUsed,
       verificationMethod,
+      consistencyOk: true,
     };
 
     return NextResponse.json({
@@ -157,11 +183,14 @@ Has this security vulnerability been completely resolved? Return ONLY JSON with 
         hadCorrectiveRetry: reanalysis.hadCorrectiveRetry,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Verify endpoint error:', error);
     return NextResponse.json(
       {
-        error: error.message || 'Internal server error during patch verification',
+        error:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Internal server error during patch verification',
       },
       { status: 500 }
     );

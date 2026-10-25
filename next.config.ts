@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+// 'unsafe-eval' is only required in development (HMR / Turbopack).
+// Production blocks JIT-style script execution for a hardened CSP.
+const isDev = process.env.NODE_ENV !== 'production';
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
 const securityHeaders = [
   {
     key: 'X-Content-Type-Options',
@@ -33,7 +40,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",

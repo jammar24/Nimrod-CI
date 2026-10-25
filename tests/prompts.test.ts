@@ -3,6 +3,8 @@ import {
   sanitizeUntrustedDiff,
   formatTriageUserPrompt,
   formatAnalyzeUserPrompt,
+  PATCH_SYSTEM_PROMPT,
+  VERIFY_REANALYSIS_SYSTEM_PROMPT,
 } from '@/lib/prompts';
 
 describe('lib/prompts: Prompt Injection Defense and Delimiter Sanitization', () => {
@@ -63,5 +65,19 @@ describe('lib/prompts: Prompt Injection Defense and Delimiter Sanitization', () 
     expect(prompt).toContain('SQL string interpolation');
     expect(prompt).toContain('<<<UNTRUSTED_CODE_DIFF_START>>>');
     expect(prompt).toContain('<<<UNTRUSTED_CODE_DIFF_END>>>');
+  });
+
+  it('verifies PATCH_SYSTEM_PROMPT includes hard safety rules against eval and dynamic execution', () => {
+    expect(PATCH_SYSTEM_PROMPT).toContain('NEVER propose eval');
+    expect(PATCH_SYSTEM_PROMPT).toContain('new Function');
+    expect(PATCH_SYSTEM_PROMPT).toContain('shell=True');
+    expect(PATCH_SYSTEM_PROMPT).toContain('exec/execSync');
+    expect(PATCH_SYSTEM_PROMPT).toContain('allow-lists');
+  });
+
+  it('verifies VERIFY_REANALYSIS_SYSTEM_PROMPT asks the required weakness question', () => {
+    expect(VERIFY_REANALYSIS_SYSTEM_PROMPT).toContain(
+      'Does the patched code still contain the original weakness OR any new security weakness introduced by the patch? List any (CWE and line).'
+    );
   });
 });

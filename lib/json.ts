@@ -99,6 +99,18 @@ export type ParseJsonResult<T> =
   | { success: false; error: string; raw: string };
 
 /**
+ * Detects whether a JSON parse failure was caused by output truncation
+ * (e.g. the model ran out of tokens mid-string, producing
+ * "Unterminated string" / "Unexpected end of JSON input" errors).
+ */
+export function isTruncationError(error: string): boolean {
+  if (!error) return false;
+  return /unterminated|unexpected end of (json )?input|end of file|unexpected end of/i.test(
+    error
+  );
+}
+
+/**
  * Robustly extracts and validates JSON against a Zod schema.
  * 1. Strips <think> blocks
  * 2. Strips markdown fences
@@ -125,10 +137,12 @@ export function extractAndValidateJson<T>(
   let parsed: unknown;
   try {
     parsed = JSON.parse(extracted);
-  } catch (parseError: any) {
+  } catch (parseError: unknown) {
+    const message =
+      parseError instanceof Error ? parseError.message : String(parseError);
     return {
       success: false,
-      error: `JSON syntax parse error: ${parseError.message}`,
+      error: `JSON syntax parse error: ${message}`,
       raw: rawText,
     };
   }

@@ -18,6 +18,7 @@ import {
 import { SECURITY_FIXTURES, SecurityFixture } from '@/lib/examples';
 import { GitHubPrDetails } from '@/lib/github';
 import { detectLanguage } from '@/lib/detect';
+import { resolveOriginalCode } from '@/lib/diffutil';
 
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -32,6 +33,7 @@ interface InputPanelProps {
   onInstantReplay: (fixture: SecurityFixture) => void;
   isRunning: boolean;
   patchedCode?: string;
+  isPatchedCodeVerified?: boolean;
   currentFilename?: string;
   lang?: 'es' | 'en';
   onGitContextChange?: (ctx: {
@@ -48,6 +50,7 @@ export function InputPanel({
   onInstantReplay,
   isRunning,
   patchedCode,
+  isPatchedCodeVerified = true,
   currentFilename = 'source.js',
   lang = 'es',
   onGitContextChange,
@@ -100,6 +103,12 @@ export function InputPanel({
 
   const handleSelectExample = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fixtureId = e.target.value;
+    if (!fixtureId) {
+      setSelectedFixture(null);
+      setOriginalCodeInput('');
+      setLanguage('auto');
+      return;
+    }
     const found = SECURITY_FIXTURES.find((f) => f.id === fixtureId);
     if (found) {
       setSelectedFixture(found);
@@ -111,7 +120,35 @@ export function InputPanel({
       setPrData(null);
     } else {
       setSelectedFixture(null);
+      setOriginalCodeInput('');
+      setLanguage('auto');
     }
+  };
+
+  const handleDiffInputChange = (val: string) => {
+    setDiffInput(val);
+    setSelectedFixture(null);
+    setOriginalCodeInput('');
+    setLanguage('auto');
+    setUploadedFileName(null);
+  };
+
+  const handleOriginalCodeChange = (val: string) => {
+    setOriginalCodeInput(val);
+    setSelectedFixture(null);
+    setLanguage('auto');
+  };
+
+  const handleAfterCodeChange = (val: string) => {
+    setAfterCodeInput(val);
+    setSelectedFixture(null);
+    setLanguage('auto');
+  };
+
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang);
+    setSelectedFixture(null);
+    setOriginalCodeInput('');
   };
 
   const processUploadedFile = (file: File) => {
@@ -221,8 +258,11 @@ export function InputPanel({
       }
 
       setSelectedFixture(null);
-    } catch (err: any) {
-      setPrError(err.message || (isEs ? 'Error al conectar con GitHub' : 'Error connecting to GitHub'));
+    } catch (err) {
+      setPrError(
+        (err instanceof Error && err.message) ||
+          (isEs ? 'Error al conectar con GitHub' : 'Error connecting to GitHub')
+      );
     } finally {
       setIsFetchingPr(false);
     }
@@ -277,11 +317,14 @@ export function InputPanel({
     const defaultExt = effectiveLanguage === 'python' ? 'py' : effectiveLanguage === 'typescript' ? 'ts' : 'js';
     const filename = uploadedFileName || (prData?.primaryFile?.filename) || (currentFilename.includes('.') ? currentFilename : `source.${defaultExt}`);
     
+    // Resolve the original code ensuring no stale example originalCode is reused
+    const resolvedOriginal = resolveOriginalCode(diffInput, originalCodeInput);
+
     if (mode === 'diff' || mode === 'file' || mode === 'github') {
-      onRunLive(diffInput, originalCodeInput, effectiveLanguage, filename);
+      onRunLive(diffInput, resolvedOriginal, effectiveLanguage, filename);
     } else {
       const synthDiff = `--- a/code.${defaultExt}\n+++ b/code.${defaultExt}\n${diffInput || afterCodeInput}`;
-      onRunLive(synthDiff, originalCodeInput, effectiveLanguage, filename);
+      onRunLive(synthDiff, resolvedOriginal, effectiveLanguage, filename);
     }
   };
 
@@ -353,6 +396,9 @@ export function InputPanel({
             onChange={handleSelectExample}
             className="text-xs font-medium bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 flex-1 min-w-0 shadow-xs truncate"
           >
+            <option value="">
+              {isEs ? '— Seleccionar ejemplo —' : '— Select an example —'}
+            </option>
             {SECURITY_FIXTURES.map((fixture) => (
               <option key={fixture.id} value={fixture.id}>
                 {fixture.name}
@@ -497,7 +543,7 @@ export function InputPanel({
           <span className="shrink-0">{isEs ? 'Lenguaje:' : 'Language:'}</span>
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={(e) => handleLanguageChange(e.target.value)}
             className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-zinc-800 dark:text-zinc-200 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-xs text-xs truncate max-w-[155px] xs:max-w-none"
           >
             <option value="auto">
@@ -584,10 +630,7 @@ export function InputPanel({
           <div className="flex-1 flex flex-col">
             <textarea
               value={diffInput}
-              onChange={(e) => {
-                setDiffInput(e.target.value);
-                setSelectedFixture(null);
-              }}
+              onChange={(e) => handleDiffInputChange(e.target.value)}
               placeholder={
                 mode === 'github'
                   ? isEs
@@ -609,10 +652,7 @@ export function InputPanel({
               </span>
               <textarea
                 value={originalCodeInput}
-                onChange={(e) => {
-                  setOriginalCodeInput(e.target.value);
-                  setSelectedFixture(null);
-                }}
+                onChange={(e) => handleOriginalCodeChange(e.target.value)}
                 placeholder={isEs ? 'Código vulnerable original...' : 'Original vulnerable code snippet...'}
                 spellCheck={false}
                 className="w-full flex-1 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 font-mono text-base sm:text-xs text-zinc-900 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800/80 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-colors"
@@ -624,7 +664,7 @@ export function InputPanel({
               </span>
               <textarea
                 value={afterCodeInput}
-                onChange={(e) => setAfterCodeInput(e.target.value)}
+                onChange={(e) => handleAfterCodeChange(e.target.value)}
                 placeholder={isEs ? 'Nuevo código a inspeccionar...' : 'New/changed code to inspect...'}
                 spellCheck={false}
                 className="w-full flex-1 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 font-mono text-base sm:text-xs text-zinc-900 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800/80 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-colors"
@@ -641,8 +681,20 @@ export function InputPanel({
             <button
               type="button"
               onClick={handleDownloadPatchedFile}
-              className="w-full sm:w-auto min-h-[44px] flex items-center justify-center space-x-1.5 px-3.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold transition-all cursor-pointer shadow-xs"
-              title={isEs ? 'Descargar archivo parcheado' : 'Download patched file ready to commit'}
+              className={`w-full sm:w-auto min-h-[44px] flex items-center justify-center space-x-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer shadow-xs ${
+                isPatchedCodeVerified === false
+                  ? 'border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-400'
+                  : 'border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+              }`}
+              title={
+                isPatchedCodeVerified === false
+                  ? isEs
+                    ? 'Descargar archivo parcheado (Atención: la verificación falló o está incompleta)'
+                    : 'Download patched file (Caution: verification failed or incomplete)'
+                  : isEs
+                  ? 'Descargar archivo parcheado'
+                  : 'Download patched file ready to commit'
+              }
             >
               {downloadedPatched ? (
                 <>
@@ -651,8 +703,13 @@ export function InputPanel({
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <Download className={`w-4 h-4 ${isPatchedCodeVerified === false ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
                   <span>{isEs ? 'Descargar Archivo Parcheado' : 'Download Patched File'}</span>
+                  {isPatchedCodeVerified === false && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/30 text-rose-500 dark:text-rose-300 text-[10px] font-bold">
+                      {isEs ? '⚠️ No verificado' : '⚠️ Unverified'}
+                    </span>
+                  )}
                 </>
               )}
             </button>

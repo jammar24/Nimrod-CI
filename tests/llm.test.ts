@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { z } from 'zod';
 import { callNemotronJson } from '@/lib/llm';
+import { isTruncationError } from '@/lib/json';
 
 describe('lib/llm: callNemotronJson with Mocked OpenAI Client', () => {
   const TestSchema = z.object({
@@ -183,5 +184,139 @@ describe('lib/llm: callNemotronJson with Mocked OpenAI Client', () => {
     ).rejects.toThrow(/Failed to parse valid JSON from Nemotron model/);
 
     expect(mockCreate).toHaveBeenCalledTimes(2);
+  });
+
+  describe('truncation handling (finish_reason: "length")', () => {
+    it('retries with a doubled max_tokens budget when output is truncated', async () => {
+      // In JS source the payload itself contains an unterminated JSON string
+      // (the JSON was cut off mid-string when the token budget ran out).
+      const truncatedPayload = '{"status": "truncated mid-str';
+      const mockCreate = vi
+        .fn()
+        // First attempt: truncated mid-JSON (token budget exhausted)
+        .mockResolvedValueOnce({
+          choices: [
+            {
+              finish_reason: 'length',
+              message: { content: truncatedPayload },
+            },
+          ],
+        })
+        // Retried with a bigger budget: complete JSON
+        .mockResolvedValueOnce({
+          choices: [
+            {
+              finish_reason: 'stop',
+              message: {
+                content: '{"status": "complete", "issuesFound": 3}',
+              },
+            },
+          ],
+        });
+
+      const mockClient = {
+        chat: { completions: { create: mockCreate } },
+      } as any;
+
+      const result = await callNemotronJson(
+        {
+          model: 'nvidia/nemotron-3-super-120b-a12b',
+          systemPrompt: 'System',
+          userPrompt: 'User',
+          schema: TestSchema,
+          maxTokens: 1500,
+        },
+        mockClient
+      );
+
+      expect(mockCreate).toHaveBeenCalledTimes(2);
+      // The retry must request double the token budget
+      expect(mockCreate.mock.calls[0][0].max_tokens).toBe(1500);
+      expect(mockCreate.mock.calls[1][0].max_tokens).toBe(3000);
+      // The corrective retry prompt must discuss the truncation
+      const corrective = mockCreate.mock.calls[1][0].messages[3].content;
+      expect(corrective).toMatch(/finish_reason/i);
+      expect(result.hadCorrectiveRetry).toBe(true);
+      expect(result.data.status).toBe('complete');
+      expect(result.data.issuesFound).toBe(3);
+    });
+
+    it('treats an unterminated-string parse error as truncation even without finish_reason', async () => {
+      const mockCreate = vi
+        .fn()
+        .mockResolvedValueOnce({
+          choices: [
+            {
+              message: { content: '{"status": "abc' }, // no finish_reason sent by provider
+            },
+          ],
+        })
+        .mockResolvedValueOnce({
+          choices: [
+            {
+              message: { content: '{"status": "abc", "issuesFound": 1}' },
+            },
+          ],
+        });
+
+      const mockClient = {
+        chat: { completions: { create: mockCreate } },
+      } as any;
+
+      const result = await callNemotronJson(
+        {
+          model: 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B',
+          systemPrompt: 'System',
+          userPrompt: 'User',
+          schema: TestSchema,
+        },
+        mockClient
+      );
+
+      expect(mockCreate).toHaveBeenCalledTimes(2);
+      expect(result.data.status).toBe('abc');
+    });
+
+    it('gives up after three attempts when the output stays truncated', async () => {
+      const mockCreate = vi.fn().mockResolvedValue({
+        choices: [
+          {
+            finish_reason: 'length',
+            message: { content: '{"status": "cut' },
+          },
+        ],
+      });
+
+      const mockClient = {
+        chat: { completions: { create: mockCreate } },
+      } as any;
+
+      await expect(
+        callNemotronJson(
+          {
+            model: 'nvidia/nemotron-3-super-120b-a12b',
+            systemPrompt: 'System',
+            userPrompt: 'User',
+            schema: TestSchema,
+          },
+          mockClient
+        )
+      ).rejects.toThrow(/Failed to parse valid JSON from Nemotron model/);
+
+      expect(mockCreate).toHaveBeenCalledTimes(3);
+    });
+  });
+});
+
+describe('lib/llm: truncation error signature detection', () => {
+  it('recognizes classic truncation parse errors', () => {
+    expect(isTruncationError('JSON syntax parse error: Unterminated string in JSON at position 1235')).toBe(true);
+    expect(isTruncationError('Unexpected end of JSON input')).toBe(true);
+  });
+
+  it('does not misclassify genuine malformed-JSON errors as truncation', () => {
+    expect(isTruncationError("Unexpected token 'I', \"Invalid non-json\" is not valid JSON")).toBe(false);
+    expect(isTruncationError('Schema validation failed: [root]: Required')).toBe(false);
+    expect(isTruncationError('')).toBe(false);
   });
 });

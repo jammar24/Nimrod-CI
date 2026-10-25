@@ -62,7 +62,15 @@ export function calculateRiskScoreAndVerdict(
   let verdict: Verdict;
   let summary: string;
 
-  if (hasUnverifiedCriticalOrHigh) {
+  // Consistency check check: if any verification failed consistency, set verdict to review
+  const hasConsistencyFailure = verifications.some(
+    (v) => v.consistencyOk === false || v.notes?.toLowerCase().includes('consistency check failed')
+  );
+
+  if (hasConsistencyFailure) {
+    verdict = 'review';
+    summary = `Patch consistency check failed: the language or file path of the generated patch does not match the analyzed finding. Manual review required.`;
+  } else if (hasUnverifiedCriticalOrHigh) {
     verdict = 'block';
     summary = `Critical or high severity vulnerabilities remain unresolved. Deployment should be blocked.`;
   } else if (hasUnverifiedMediumOrLow) {
@@ -73,7 +81,7 @@ export function calculateRiskScoreAndVerdict(
     summary =
       findings.length === 0
         ? `No security vulnerabilities detected. Code change passed review.`
-        : `All detected vulnerabilities were successfully resolved and verified. Safe to merge.`;
+        : `All detected vulnerabilities were successfully resolved and verified. Automated review passed.`;
   }
 
   const stats: ReportStats = {

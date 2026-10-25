@@ -13,8 +13,12 @@ export default function LandingPage() {
   const [lang, setLang] = useState<'es' | 'en'>('en');
 
   React.useEffect(() => {
-    const saved = localStorage.getItem('nimrod_lang') as 'es' | 'en' | null;
-    if (saved) setLang(saved);
+    // Defer state update to avoid a cascading synchronous render in the effect
+    const raf = requestAnimationFrame(() => {
+      const saved = localStorage.getItem('nimrod_lang') as 'es' | 'en' | null;
+      if (saved) setLang(saved);
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   const handleToggleLang = () => {

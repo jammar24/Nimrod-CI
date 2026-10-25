@@ -4,7 +4,13 @@ import { Finding, Reference } from './schemas';
 export interface EnrichOptions {
   findings: Finding[];
   language?: string;
-  clientOverride?: any;
+  // Minimal structural contract for the Tavily search client (real or mocked in tests)
+  clientOverride?: {
+    search: (
+      query: string,
+      opts: { maxResults: number; searchDepth: 'basic' | 'advanced' }
+    ) => Promise<{ results?: Array<{ title?: unknown; url?: unknown; content?: unknown }> }>;
+  };
 }
 
 /**
@@ -31,7 +37,9 @@ export async function enrichFindingsWithTavily(
     return findings;
   }
 
-  const client = clientOverride || tavily({ apiKey });
+  const client =
+    clientOverride ||
+    (tavily({ apiKey }) as unknown as NonNullable<EnrichOptions['clientOverride']>);
 
   const enrichedFindings: Finding[] = [];
 
@@ -56,28 +64,33 @@ export async function enrichFindingsWithTavily(
       });
 
       const references: Reference[] = (response.results || [])
-        .filter((res: any) => {
-          if (!res.url || typeof res.url !== 'string') return false;
+        .filter((res: unknown) => {
+          const item = res as { url?: unknown };
+          if (!item.url || typeof item.url !== 'string') return false;
           try {
-            const parsed = new URL(res.url);
+            const parsed = new URL(item.url);
             return parsed.protocol === 'http:' || parsed.protocol === 'https:';
           } catch {
             return false;
           }
         })
-        .map((res: any) => ({
-          title: String(res.title || 'Security Guidance').slice(0, 150),
-          url: res.url,
-          snippet: res.content ? String(res.content).slice(0, 200) : undefined,
-        }));
+        .map((res: unknown) => {
+          const item = res as { title?: unknown; url?: unknown; content?: unknown };
+          return {
+            title: String(item.title || 'Security Guidance').slice(0, 150),
+            url: String(item.url),
+            snippet: item.content ? String(item.content).slice(0, 200) : undefined,
+          };
+        });
 
       enrichedFindings.push({
         ...finding,
         references: [...(finding.references || []), ...references],
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.warn(
-        `[WARN] Tavily search failed for finding "${finding.title}": ${err.message}. Continuing with existing references.`
+        `[WARN] Tavily search failed for finding "${finding.title}": ${message}. Continuing with existing references.`
       );
       enrichedFindings.push(finding);
     }

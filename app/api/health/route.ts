@@ -39,6 +39,10 @@ export async function GET() {
       dailyCap: parseInt(process.env.DAILY_REQUEST_CAP || '300', 10),
       ipLimitPerMin: 20,
     },
+    models: {
+      primary: primaryModel,
+      fast: fastModel,
+    },
     integrations: {
       nebiusTokenFactory: {
         configured: envStatus['NEBIUS_API_KEY'] === '<set>',

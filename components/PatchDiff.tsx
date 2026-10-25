@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Terminal } from 'lucide-react';
+import { Copy, Check, Terminal, AlertTriangle } from 'lucide-react';
 
 interface PatchDiffProps {
   unifiedDiff: string;
   filename?: string;
+  isUnverified?: boolean;
+  lang?: 'es' | 'en';
 }
 
-export function PatchDiff({ unifiedDiff, filename }: PatchDiffProps) {
+export function PatchDiff({ unifiedDiff, filename, isUnverified = false, lang = 'es' }: PatchDiffProps) {
+  const isEs = lang === 'es';
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -28,24 +31,43 @@ export function PatchDiff({ unifiedDiff, filename }: PatchDiffProps) {
             {filename || 'Remediation Unified Diff'}
           </span>
         </div>
-        <button
-          onClick={handleCopy}
-          type="button"
-          className="shrink-0 flex items-center space-x-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors text-[11px]"
-          title="Copy unified diff to clipboard"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3 h-3 text-emerald-400" />
-              <span className="text-emerald-400">Copied</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3 h-3" />
-              <span>Copy patch</span>
-            </>
+        <div className="flex items-center space-x-2 shrink-0">
+          {isUnverified && (
+            <span
+              data-testid="unverified-diff-label"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-semibold"
+            >
+              <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
+              <span>{isEs ? 'Advertencia: No Verificado' : 'Warning: Unverified'}</span>
+            </span>
           )}
-        </button>
+          <button
+            onClick={handleCopy}
+            type="button"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors text-[11px]"
+            title={
+              isUnverified
+                ? isEs
+                  ? 'Copiar parche (Atención: no verificado)'
+                  : 'Copy patch (Caution: unverified)'
+                : isEs
+                ? 'Copiar parche al portapapeles'
+                : 'Copy unified diff to clipboard'
+            }
+          >
+            {copied ? (
+              <>
+                <Check className="w-3 h-3 text-emerald-400" />
+                <span className="text-emerald-400">{isEs ? 'Copiado' : 'Copied'}</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3" />
+                <span>{isEs ? 'Copiar parche' : 'Copy patch'}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="p-3 overflow-x-auto max-h-80 select-text leading-5">

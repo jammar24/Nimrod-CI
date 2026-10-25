@@ -19,7 +19,7 @@ export function checkJavaScriptSyntax(code: string): SyntaxCheckResult {
       sourceType: 'module',
     });
     return { valid: true, engineUsed: 'acorn' };
-  } catch (moduleError: any) {
+  } catch (moduleError) {
     // Fall back to script mode (common for snippets with return outside functions)
     try {
       acorn.parse(code, {
@@ -27,10 +27,12 @@ export function checkJavaScriptSyntax(code: string): SyntaxCheckResult {
         sourceType: 'script',
       });
       return { valid: true, engineUsed: 'acorn' };
-    } catch (scriptError: any) {
+    } catch {
       return {
         valid: false,
-        error: `JavaScript syntax error: ${moduleError.message}`,
+        error: `JavaScript syntax error: ${
+          moduleError instanceof Error ? moduleError.message : String(moduleError)
+        }`,
         engineUsed: 'acorn',
       };
     }
@@ -73,10 +75,12 @@ export function checkTypeScriptSyntax(code: string): SyntaxCheckResult {
     }
 
     return { valid: true, engineUsed: 'typescript' };
-  } catch (err: any) {
+  } catch (err) {
     return {
       valid: false,
-      error: `TypeScript check failed: ${err.message}`,
+      error: `TypeScript check failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
       engineUsed: 'typescript',
     };
   }
@@ -86,6 +90,8 @@ import { detectLanguage } from './detect';
 
 /**
  * Evaluates syntax based on programming language.
+ * Acorn runs ONLY for JavaScript (TypeScript compiler for TypeScript).
+ * For Python: returns "Syntax check not available for Python; model re-analysis only".
  */
 export function checkSyntax(
   code: string,
@@ -97,6 +103,14 @@ export function checkSyntax(
     normalizedLang = detectLanguage('', code);
   }
 
+  if (normalizedLang === 'python' || normalizedLang === 'py') {
+    return {
+      valid: true,
+      engineUsed: 'none',
+      notes: 'Syntax check not available for Python; model re-analysis only',
+    };
+  }
+
   if (normalizedLang === 'typescript' || normalizedLang === 'ts') {
     return checkTypeScriptSyntax(code);
   }
@@ -105,17 +119,10 @@ export function checkSyntax(
     return checkJavaScriptSyntax(code);
   }
 
-  if (normalizedLang === 'python' || normalizedLang === 'py') {
-    return {
-      valid: true,
-      engineUsed: 'none',
-      notes: 'Python syntax validation delegated to Nemotron model re-analysis.',
-    };
-  }
-
-  // Auto or other fallback: attempt TS (which supersets JS)
-  const tsCheck = checkTypeScriptSyntax(code);
-  if (tsCheck.valid) return tsCheck;
-
-  return checkJavaScriptSyntax(code);
+  // Any non-JS/TS language: Acorn must NOT run
+  return {
+    valid: true,
+    engineUsed: 'none',
+    notes: `Syntax check not available for ${normalizedLang}; model re-analysis only`,
+  };
 }

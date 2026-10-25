@@ -65,11 +65,14 @@ export async function POST(req: NextRequest) {
         hadCorrectiveRetry: result.hadCorrectiveRetry,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Triage endpoint error:', error);
     return NextResponse.json(
       {
-        error: error.message || 'Internal server error during triage execution',
+        error:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Internal server error during triage execution',
       },
       { status: 500 }
     );
