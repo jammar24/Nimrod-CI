@@ -4,7 +4,7 @@ import { enrichFindingsWithTavily } from '@/lib/enrich';
 import { FindingSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
 
-export const maxDuration = 30;
+export const maxDuration = 120; // Hobby + Fluid Compute: raised from 30 s
 
 const EnrichRequestSchema = z.object({
   findings: z.array(FindingSchema),

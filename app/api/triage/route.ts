@@ -5,7 +5,7 @@ import { TRIAGE_SYSTEM_PROMPT, formatTriageUserPrompt } from '@/lib/prompts';
 import { TriageResultSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
 
-export const maxDuration = 30; // Max allowed serverless duration in seconds
+export const maxDuration = 120; // Hobby + Fluid Compute: raised from 30 s
 
 const TriageRequestSchema = z.object({
   diff: z.string().min(1, 'Diff cannot be empty').max(20000, 'Diff exceeds 20000 characters limit'),

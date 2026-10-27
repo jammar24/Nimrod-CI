@@ -302,3 +302,44 @@ export function checkPatchConsistency(
   };
 }
 
+/**
+ * Truncates and centers the code context around the vulnerable snippet,
+ * keeping the overall payload compact to avoid model generation timeouts.
+ */
+export function getCondensedCodeContext(
+  originalCode: string,
+  vulnerableSnippet?: string,
+  maxLines: number = 60
+): string {
+  if (!originalCode || originalCode.length < 1500) {
+    return originalCode;
+  }
+
+  const lines = originalCode.split('\n');
+  if (lines.length <= maxLines) {
+    return originalCode;
+  }
+
+  const cleanSnippet = vulnerableSnippet
+    ? vulnerableSnippet.trim().split('\n')[0]?.trim() || ''
+    : '';
+  let matchIndex = -1;
+
+  if (cleanSnippet) {
+    matchIndex = lines.findIndex((l) => l.includes(cleanSnippet));
+  }
+
+  if (matchIndex === -1) {
+    return lines.slice(0, maxLines).join('\n') + '\n// ... [remaining code omitted for brevity]';
+  }
+
+  const half = Math.floor(maxLines / 2);
+  const start = Math.max(0, matchIndex - half);
+  const end = Math.min(lines.length, matchIndex + half);
+
+  const prefix = start > 0 ? '// ... [preceding code omitted for brevity]\n' : '';
+  const suffix = end < lines.length ? '\n// ... [remaining code omitted for brevity]' : '';
+
+  return prefix + lines.slice(start, end).join('\n') + suffix;
+}
+

@@ -6,7 +6,7 @@ import { AnalyzeResultSchema, RiskyHunkSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { assembleReport } from '@/lib/report';
 
-export const maxDuration = 60; // Up to 60s for deep SAST reasoning
+export const maxDuration = 120; // Hobby + Fluid Compute: raised from 60 s
 
 const AnalyzeRequestSchema = z.object({
   diff: z.string().min(1, 'Diff cannot be empty').max(20000, 'Diff exceeds maximum allowed limit'),

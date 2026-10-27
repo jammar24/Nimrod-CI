@@ -132,9 +132,9 @@ OUTPUT SCHEMA:
 Return ONLY valid JSON matching this structure:
 {
   "findingId": "string",
-  "unifiedDiff": "string (unified diff starting with --- a/... and +++ b/...)",
+  "unifiedDiff": "string (minimal unified diff starting with --- a/... and +++ b/...)",
   "patchedCode": "string (the complete fixed source code for the file)",
-  "rationale": "string (clear, concise explanation of the security fix applied)"
+  "rationale": "string (very short 1-2 sentence explanation of the security fix, under 40 words)"
 }
 
 Do not wrap in markdown fences. Output raw JSON only.`;

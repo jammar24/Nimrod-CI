@@ -5,7 +5,7 @@ import { detectLanguage } from './detect';
 import { resolveOriginalCode } from './diffutil';
 
 export type StepId = 'triage' | 'analyze' | 'enrich' | 'patch' | 'verify';
-export type StepStatus = 'idle' | 'running' | 'completed' | 'error';
+export type StepStatus = 'idle' | 'running' | 'completed' | 'error' | 'skipped';
 
 export interface StepProgress {
   id: StepId;
@@ -237,6 +237,12 @@ export async function runLivePipeline(
         patchDurationMs += Date.now() - patchT0;
 
         if (!patchRes.ok) {
+          if (patchRes.status === 504) {
+            throw new Error(
+              'Patch generation timed out on the server (504). ' +
+              'The model took too long to respond. Please try a smaller diff.'
+            );
+          }
           const err = await patchRes.json().catch(() => ({}));
           throw new Error(err.error || `Patch generation failed: ${patchRes.status}`);
         }
@@ -312,16 +318,27 @@ export async function runLivePipeline(
       isReplay: false,
     };
   } catch (error) {
-    // Mark any running step as error
-    const running = steps.find((s) => s.status === 'running');
-    if (running) {
-      updateStep(running.id, {
+    // Mark the currently-running step as error
+    const failedIdx = steps.findIndex((s) => s.status === 'running');
+    if (failedIdx !== -1) {
+      updateStep(steps[failedIdx].id, {
         status: 'error',
         details:
           error instanceof Error && error.message
             ? error.message
             : 'Execution error',
       });
+    }
+    // Mark every subsequent step that hasn't started yet as 'skipped'
+    // so the UI shows a neutral icon instead of an endless spinner.
+    for (let i = failedIdx + 1; i < steps.length; i++) {
+      const s = steps[i];
+      if (s.status === 'idle' || s.status === 'running') {
+        updateStep(s.id, {
+          status: 'skipped',
+          details: 'Skipped (previous step failed)',
+        });
+      }
     }
     throw error;
   }

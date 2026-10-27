@@ -10,6 +10,7 @@ export interface LlmCallOptions<T> {
   schema: z.ZodType<T>;
   maxTokens?: number;
   temperature?: number;
+  reasoningEffort?: 'low' | 'medium' | 'high';
 }
 
 export interface LlmCallResult<T> {
@@ -131,6 +132,7 @@ export async function callNemotronJson<T>(
       messages,
       temperature: attempt === 1 ? options.temperature ?? 0.1 : 0.05,
       max_tokens: attemptTokens,
+      ...(options.reasoningEffort ? { reasoning_effort: options.reasoningEffort } : {}),
     });
 
     const choice = response.choices?.[0];

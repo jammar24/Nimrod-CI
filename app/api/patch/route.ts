@@ -4,9 +4,11 @@ import { callNemotronJson, getModelConfig } from '@/lib/llm';
 import { FindingSchema, PatchSchema } from '@/lib/schemas';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { sanitizeUntrustedDiff, PATCH_SYSTEM_PROMPT } from '@/lib/prompts';
-import { ensureDiffHeaderHasRealPath } from '@/lib/diffutil';
+import { ensureDiffHeaderHasRealPath, getCondensedCodeContext } from '@/lib/diffutil';
+import { sanitizeServerLog, isTimeoutOrGatewayError } from '@/lib/logging';
 
-export const maxDuration = 60;
+// Hobby plan + Fluid Compute: maximum allowed duration is 300 s.
+export const maxDuration = 300;
 
 const PatchRequestSchema = z.object({
   finding: FindingSchema,
@@ -40,13 +42,22 @@ export async function POST(req: NextRequest) {
 
     const safeFeedback = feedback ? sanitizeUntrustedDiff(feedback) : '';
     const safeSnippet = sanitizeUntrustedDiff(finding.vulnerableSnippet);
-    const safeOriginalCode = sanitizeUntrustedDiff(originalCode);
+
+    // Condense source context: center the window around the vulnerable snippet
+    // to reduce prompt size and model generation time without losing the fix target.
+    const condensedCode = getCondensedCodeContext(originalCode, finding.vulnerableSnippet, 60);
+    const safeOriginalCode = sanitizeUntrustedDiff(condensedCode);
 
     const feedbackSection = safeFeedback
       ? `\n⚠️ PREVIOUS ATTEMPT FAILED VERIFICATION:\n${safeFeedback}\nPlease correct this mistake in your new patch.\n`
       : '';
 
-    const userPrompt = `Target Language: ${language}
+    const buildUserPrompt = (includeFullCode: boolean) => {
+      const codeBlock = includeFullCode
+        ? `<<<ORIGINAL_SOURCE_CODE_START>>>\n${safeOriginalCode}\n<<<ORIGINAL_SOURCE_CODE_END>>>`
+        : `Vulnerable snippet only (full file unavailable on retry):\n${safeSnippet}`;
+
+      return `Target Language: ${language}
 Target File: ${finding.file}
 Finding to remediate:
 - ID: ${finding.id}
@@ -55,28 +66,48 @@ Finding to remediate:
 - Vulnerable Snippet: ${safeSnippet}
 - Explanation: ${finding.explanation}
 ${feedbackSection}
-<<<ORIGINAL_SOURCE_CODE_START>>>
-${safeOriginalCode}
-<<<ORIGINAL_SOURCE_CODE_END>>>
+${codeBlock}
 
-Write the minimal security patch.
+Write the minimal security patch. Keep unifiedDiff and patchedCode compact.
 HARD SAFETY RULES:
 - Never propose eval, new Function, exec/execSync with interpolated input, shell=True, or any construct that executes untrusted input as code.
-- Prefer allow-lists, parsing (e.g. safe expression parser), or removing dynamic evaluation. If no safe fix exists, propose removing dynamic evaluation instead of inventing a "safe" eval.
+- Prefer allow-lists, parsing, or removing dynamic evaluation entirely.
 - In unifiedDiff header, use the exact real file path: --- a/${finding.file} and +++ b/${finding.file}.
 
 Return strictly valid JSON matching the Patch schema with findingId="${finding.id}".`;
+    };
 
-    const result = await callNemotronJson({
-      model: modelPrimary,
-      systemPrompt: PATCH_SYSTEM_PROMPT,
-      userPrompt,
-      schema: PatchSchema,
-      temperature: 0.05,
-      // Nemotron spends tokens "thinking" before emitting JSON; a low budget
-      // truncates the unifiedDiff/patchedCode strings mid-JSON (Unterminated string).
-      maxTokens: 6000,
-    });
+    /**
+     * Call the LLM and retry once on 504 / timeout with a shorter prompt.
+     * reasoning_effort 'low' is the least expensive setting the OpenAI-compatible
+     * API supports, reducing thinking-token overhead while still producing a valid diff.
+     */
+    const callPatch = async (includeFullCode: boolean) =>
+      callNemotronJson({
+        model: modelPrimary,
+        systemPrompt: PATCH_SYSTEM_PROMPT,
+        userPrompt: buildUserPrompt(includeFullCode),
+        schema: PatchSchema,
+        temperature: 0.05,
+        maxTokens: 2800,
+        reasoningEffort: 'low',
+      });
+
+    let result;
+    try {
+      result = await callPatch(true);
+    } catch (firstError: unknown) {
+      if (isTimeoutOrGatewayError(firstError)) {
+        console.error(
+          '[patch] First attempt timed out, retrying with shorter prompt. Cause:',
+          sanitizeServerLog(firstError)
+        );
+        // Retry once with only the snippet, not the full code window
+        result = await callPatch(false);
+      } else {
+        throw firstError;
+      }
+    }
 
     const patchData = {
       ...result.data,
@@ -93,7 +124,13 @@ Return strictly valid JSON matching the Patch schema with findingId="${finding.i
       },
     });
   } catch (error) {
-    console.error('Patch endpoint error:', error);
+    const isTimeout = isTimeoutOrGatewayError(error);
+    console.error(
+      '[patch] Endpoint error (type=%s):',
+      isTimeout ? 'timeout/504' : 'other',
+      sanitizeServerLog(error)
+    );
+    const status = isTimeout ? 504 : 500;
     return NextResponse.json(
       {
         error:
@@ -101,7 +138,7 @@ Return strictly valid JSON matching the Patch schema with findingId="${finding.i
             ? error.message
             : 'Internal server error during patch generation',
       },
-      { status: 500 }
+      { status }
     );
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, AlertCircle, Loader2, Circle, Clock } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2, Circle, Clock, MinusCircle } from 'lucide-react';
 import { StepProgress } from '@/lib/pipeline';
 
 interface PipelineTrackerProps {
@@ -69,6 +69,7 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
           const isRunning = step.status === 'running';
           const isCompleted = step.status === 'completed';
           const isError = step.status === 'error';
+          const isSkipped = step.status === 'skipped';
 
           const localized = isEs && STEP_TRANSLATIONS[step.id] ? STEP_TRANSLATIONS[step.id] : null;
           const displayTitle = localized?.title || step.title;
@@ -103,6 +104,11 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
                     <AlertCircle className="w-5 h-5" />
                   </div>
                 )}
+                {isSkipped && (
+                  <div className="p-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500">
+                    <MinusCircle className="w-5 h-5" />
+                  </div>
+                )}
                 {isPending && (
                   <div className="p-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600">
                     <Circle className="w-5 h-5" />
@@ -121,6 +127,8 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
                         ? 'text-zinc-900 dark:text-zinc-200'
                         : isError
                         ? 'text-rose-600 dark:text-rose-400'
+                        : isSkipped
+                        ? 'text-zinc-400 dark:text-zinc-500'
                         : 'text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
@@ -147,6 +155,8 @@ export function PipelineTracker({ steps, isReplay, lang = 'es' }: PipelineTracke
                           ? 'text-rose-600 dark:text-rose-400 font-medium'
                           : isRunning
                           ? 'text-amber-600 dark:text-amber-300'
+                          : isSkipped
+                          ? 'text-zinc-400 dark:text-zinc-500 italic'
                           : 'text-zinc-600 dark:text-zinc-300'
                       }`}
                     >
