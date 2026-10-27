@@ -38,7 +38,7 @@ Traditional Static Application Security Testing (SAST) tools generate overwhelmi
 
 ## 🚀 Live Demo & Video
 
-- **Live Application URL:** *[Deploy link available upon Vercel release]*
+- **Live Application URL:** https://nimrod-ci.vercel.app/
 - **Video Walkthrough (< 3 min):** *[YouTube demonstration link]*
 
 ---
