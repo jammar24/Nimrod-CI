@@ -8,11 +8,6 @@
 > **Autonomous Security Reviewer Powered by Nebius Token Factory & NVIDIA Nemotron**
 > *Track: Coding and Agentic Engineering — Nebius x NVIDIA Global AI Hackathon*
 > Built by **Jamar Masias** ([@jammar24](https://github.com/jammar24)) for the Nebius x NVIDIA Global AI Hackathon.
-<<<<<<< HEAD
-
-=======
-> **Repository:** [https://github.com/jammar24/Nimrod-CI](https://github.com/jammar24/Nimrod-CI)
->>>>>>> 3dbdf92 (fix: harden patch verification and correct UI claims)
 
 [![CI Quality Gate](https://github.com/jammar24/Nimrod-CI/actions/workflows/ci.yml/badge.svg)](https://github.com/jammar24/Nimrod-CI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
@@ -27,7 +22,7 @@ Powered by Nebius Token Factory · NVIDIA Nemotron · Tavily
 
 Traditional Static Application Security Testing (SAST) tools generate overwhelming volumes of false positives, slow down engineering teams, and never provide remediations.
 
-**NIMROD-CI** is an autonomous agentic reviewer for code diffs that:
+**Nimrod-CI** is an autonomous agentic reviewer for code diffs that:
 1. **Finds security vulnerabilities** in added or modified code hunks using NVIDIA Nemotron reasoning models.
 2. **Enriches findings with references** — fetches CWE/OWASP references and current sources via Tavily.
 3. **Synthesizes minimal, non-breaking security patches** under hard safety rules (zero dynamic eval, safe parsing, allowlists, preserving real file paths).
@@ -347,16 +342,11 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for full details.
 ## 👨‍💻 Team
 
 <p align="center">
-<<<<<<< HEAD
   <img src="public/avatar.jpg" alt="Jamar Masias" width="120" style="border-radius: 50%;" /><br />
 
   <strong align="center">Jamar Masias</strong> (<a href="https://github.com/jammar24">@jammar24</a>)<br />
   <em>Creator & Security Architect of Nimrod-CI</em><br />
-=======
-  <strong>Jamar Masias</strong> (<a href="https://github.com/jammar24">@jammar24</a>)<br />
-  <em>Creator & Security Architect of Nimrod-CI</em><br />
   <a href="https://github.com/jammar24/Nimrod-CI">github.com/jammar24/Nimrod-CI</a>
->>>>>>> 3dbdf92 (fix: harden patch verification and correct UI claims)
 </p>
 
 Designed and directed for the Nebius x NVIDIA Global AI Hackathon; implemented with AI assistance.
